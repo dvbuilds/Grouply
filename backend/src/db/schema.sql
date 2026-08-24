@@ -71,6 +71,18 @@ CREATE INDEX idx_group_members_user ON group_members(user_id);
 CREATE INDEX idx_submissions_assignment ON submissions(assignment_id);
 CREATE INDEX idx_submissions_group ON submissions(group_id);
 
+-- Added during backend hardening pass. users.email and the (assignment_id,
+-- group_id) / (group_id, user_id) unique constraints above already create
+-- their own indexes, so those are intentionally NOT duplicated here.
+-- due_date drives ORDER BY on nearly every assignment listing query
+-- (studentAssignments, allAssignments, analytics perAssignment).
+CREATE INDEX idx_assignments_due_date ON assignments(due_date);
+-- assignment_targets already has a unique index on (assignment_id, group_id),
+-- which Postgres can use for lookups on assignment_id alone (leftmost
+-- column), but a reverse lookup "which assignments target group X" needs
+-- its own index on group_id.
+CREATE INDEX idx_assignment_targets_group ON assignment_targets(group_id);
+
 /*
 ER RELATIONSHIPS
 -----------------

@@ -6,7 +6,9 @@
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "migrate": "node -e \"require('dotenv').config();const fs=require('fs');const pool=require('./src/db/pool');pool.query(fs.readFileSync('./src/db/schema.sql','utf8')).then(()=>{console.log('Migrated');process.exit(0);}).catch(e=>{console.error(e);process.exit(1);})\"",
+    "migrate:indexes": "node -e \"require('dotenv').config();const fs=require('fs');const pool=require('./src/db/pool');pool.query(fs.readFileSync('./src/db/migrations/001_add_performance_indexes.sql','utf8')).then(()=>{console.log('Indexes migrated');process.exit(0);}).catch(e=>{console.error(e);process.exit(1);})\"",
     "seed": "node src/db/seed.js",
+    "explain": "node scripts/explain-analyze.js",
     "test": "jest --runInBand"
   },
   "dependencies": {
@@ -14,7 +16,9 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "express-rate-limit": "^8.6.2",
     "express-validator": "^7.2.0",
+    "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.12.0"
   },
@@ -25,6 +29,8 @@
   },
   "jest": {
     "testEnvironment": "node",
-    "testPathIgnorePatterns": ["/node_modules/"]
+    "testPathIgnorePatterns": [
+      "/node_modules/"
+    ]
   }
 }

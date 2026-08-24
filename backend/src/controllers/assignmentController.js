@@ -1,13 +1,13 @@
 const pool = require('../db/pool');
+const AppError = require('../utils/AppError');
+const asyncHandler = require('../utils/asyncHandler');
+const { parsePagination, setPaginationHeaders } = require('../utils/pagination');
 
 // Admin creates an assignment, optionally scoped to specific groups.
 // A `submissions` row is pre-created per target group so progress can be
 // tracked from 'pending' without extra logic later.
-async function createAssignment(req, res) {
+const createAssignment = asyncHandler(async (req, res) => {
   const { title, description, due_date, onedrive_link, target_scope, group_ids } = req.body;
-  if (!title || !due_date || !onedrive_link) {
-    return res.status(400).json({ error: 'title, due_date, onedrive_link are required' });
-  }
 
   const client = await pool.connect();
   try {
@@ -46,14 +46,13 @@ async function createAssignment(req, res) {
     res.status(201).json(assignment.rows[0]);
   } catch (err) {
     await client.query('ROLLBACK');
-    console.error(err);
-    res.status(500).json({ error: 'Could not create assignment' });
+    throw err;
   } finally {
     client.release();
   }
-}
+});
 
-async function updateAssignment(req, res) {
+const updateAssignment = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { title, description, due_date, onedrive_link } = req.body;
   const result = await pool.query(
@@ -65,21 +64,22 @@ async function updateAssignment(req, res) {
      WHERE id = $5 RETURNING *`,
     [title, description, due_date, onedrive_link, id]
   );
-  if (!result.rows.length) return res.status(404).json({ error: 'Assignment not found' });
+  if (!result.rows.length) throw new AppError(404, 'Assignment not found');
   res.json(result.rows[0]);
-}
+});
 
 // Admin deletes an assignment (cascades to its targets and submissions)
-async function deleteAssignment(req, res) {
+const deleteAssignment = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const result = await pool.query('DELETE FROM assignments WHERE id = $1 RETURNING id', [id]);
-  if (!result.rows.length) return res.status(404).json({ error: 'Assignment not found' });
+  if (!result.rows.length) throw new AppError(404, 'Assignment not found');
   res.json({ message: 'Assignment deleted' });
-}
+});
 
 // Assignments visible to the logged-in student: those targeting 'all',
-// plus those scoped to a group the student belongs to.
-async function studentAssignments(req, res) {
+// plus those scoped to a group the student belongs to. Scoped to one
+// student's own visibility, so left unpaginated (naturally small).
+const studentAssignments = asyncHandler(async (req, res) => {
   const result = await pool.query(
     `SELECT DISTINCT a.*
      FROM assignments a
@@ -90,12 +90,24 @@ async function studentAssignments(req, res) {
     [req.user.id]
   );
   res.json(result.rows);
-}
+});
 
-async function allAssignments(req, res) {
-  const result = await pool.query('SELECT * FROM assignments ORDER BY due_date ASC');
+// Admin: every assignment. Bounded + paginated since this grows over a
+// semester and should never be loaded unbounded into memory/the browser.
+const allAssignments = asyncHandler(async (req, res) => {
+  const pagination = parsePagination(req.query);
+
+  const [result, countResult] = await Promise.all([
+    pool.query(
+      'SELECT * FROM assignments ORDER BY due_date ASC LIMIT $1 OFFSET $2',
+      [pagination.limit, pagination.offset]
+    ),
+    pool.query('SELECT COUNT(*) FROM assignments'),
+  ]);
+
+  setPaginationHeaders(res, pagination, Number(countResult.rows[0].count));
   res.json(result.rows);
-}
+});
 
 module.exports = {
   createAssignment, updateAssignment, deleteAssignment, studentAssignments, allAssignments,

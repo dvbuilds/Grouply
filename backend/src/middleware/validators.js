@@ -1,4 +1,4 @@
-const { body, param } = require('express-validator');
+const { body, param, query } = require('express-validator');
 
 const registerRules = [
   body('name').trim().notEmpty().withMessage('Name is required').isLength({ max: 100 }),
@@ -29,6 +29,30 @@ const addMemberRules = [
   }),
 ];
 
+// Param-only validators for routes with no body, so a non-numeric id gets a
+// clean 400 instead of falling through to Postgres and surfacing a 500.
+const groupIdParamRules = [
+  param('groupId').isInt().withMessage('Invalid group id'),
+];
+
+const memberIdParamRules = [
+  param('groupId').isInt().withMessage('Invalid group id'),
+  param('userId').isInt().withMessage('Invalid user id'),
+];
+
+const assignmentIdParamRules = [
+  param('id').isInt().withMessage('Invalid assignment id'),
+];
+
+const submissionParamRules = [
+  param('assignmentId').isInt().withMessage('Invalid assignment id'),
+  param('groupId').isInt().withMessage('Invalid group id'),
+];
+
+const assignmentIdOnlyParamRules = [
+  param('assignmentId').isInt().withMessage('Invalid assignment id'),
+];
+
 const createAssignmentRules = [
   body('title').trim().notEmpty().withMessage('Title is required').isLength({ max: 150 }),
   body('description').optional({ checkFalsy: true }).isLength({ max: 5000 }),
@@ -36,6 +60,7 @@ const createAssignmentRules = [
   body('onedrive_link').trim().isURL().withMessage('onedrive_link must be a valid URL'),
   body('target_scope').optional().isIn(['all', 'groups']),
   body('group_ids').optional().isArray().withMessage('group_ids must be an array'),
+  body('group_ids.*').optional().isInt().withMessage('group_ids must contain valid ids'),
 ];
 
 const updateAssignmentRules = [
@@ -45,7 +70,15 @@ const updateAssignmentRules = [
   body('onedrive_link').optional().trim().isURL(),
 ];
 
+// Shared pagination query validation for list endpoints.
+const paginationRules = [
+  query('page').optional().isInt({ min: 1 }).withMessage('page must be a positive integer'),
+  query('limit').optional().isInt({ min: 1 }).withMessage('limit must be a positive integer'),
+];
+
 module.exports = {
   registerRules, loginRules, createGroupRules, addMemberRules,
-  createAssignmentRules, updateAssignmentRules,
+  groupIdParamRules, memberIdParamRules, assignmentIdParamRules,
+  submissionParamRules, assignmentIdOnlyParamRules,
+  createAssignmentRules, updateAssignmentRules, paginationRules,
 };
