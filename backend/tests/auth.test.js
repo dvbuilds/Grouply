@@ -26,7 +26,7 @@ describe('POST /api/auth/register', () => {
 
   it('registers a valid student and returns a token', async () => {
     pool.query
-      .mockResolvedValueOnce({ rows: [] }) // no existing user
+      .mockResolvedValueOnce({ rows: [] })
       .mockResolvedValueOnce({
         rows: [{ id: 1, name: 'Divya', email: 'divya@example.com', role: 'student', student_id: null }],
       });
@@ -41,7 +41,7 @@ describe('POST /api/auth/register', () => {
   });
 
   it('rejects a duplicate email with 409', async () => {
-    pool.query.mockResolvedValueOnce({ rows: [{ id: 1 }] }); // existing user found
+    pool.query.mockResolvedValueOnce({ rows: [{ id: 1 }] });
 
     const res = await request(app)
       .post('/api/auth/register')

@@ -31,8 +31,8 @@ describe('auth middleware', () => {
 
   it('allows an admin to reach an admin-only route', async () => {
     pool.query
-      .mockResolvedValueOnce({ rows: [] }) // group list
-      .mockResolvedValueOnce({ rows: [{ count: '0' }] }); // total count
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [{ count: '0' }] });
     const token = signToken({ id: 2, role: 'admin', name: 'Prof', email: 'p@x.com' });
     const res = await request(app)
       .get('/api/groups')

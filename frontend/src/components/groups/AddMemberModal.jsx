@@ -6,7 +6,7 @@ import { UserPlus, Mail, IdCard, AlertCircle } from 'lucide-react';
 import { addGroupMemberApi } from '../../api/groups.js';
 
 export default function AddMemberModal({ isOpen, onClose, groupId, groupName, onMemberAdded }) {
-  const [inputType, setInputType] = useState('email'); // 'email' | 'student_id'
+  const [inputType, setInputType] = useState('email');
   const [identifier, setIdentifier] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -29,7 +29,7 @@ export default function AddMemberModal({ isOpen, onClose, groupId, groupName, on
     } catch (err) {
       setError(
         err.response?.data?.details?.[0]?.message ||
-          err.response?.data?.message ||
+          err.response?.data?.error ||
           'Failed to add member. Please check the identifier.'
       );
     } finally {
@@ -53,7 +53,7 @@ export default function AddMemberModal({ isOpen, onClose, groupId, groupName, on
           </div>
         )}
 
-        {/* Identifier Mode Toggle */}
+        {}
         <div className="space-y-1.5">
           <label className="block text-xs font-semibold uppercase tracking-wider text-[#414844]">
             Find Student By

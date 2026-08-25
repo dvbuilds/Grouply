@@ -18,7 +18,7 @@ export default function CreateAssignmentModal({
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [onedriveLink, setOnedriveLink] = useState('');
-  const [targetScope, setTargetScope] = useState('all'); // 'all' | 'groups'
+  const [targetScope, setTargetScope] = useState('all');
   const [selectedGroupIds, setSelectedGroupIds] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -81,8 +81,6 @@ export default function CreateAssignmentModal({
     try {
       let payload;
       if (isEditing) {
-        // The backend only supports updating these fields on an existing
-        // assignment; target scope/groups are fixed at creation time.
         payload = {
           title: title.trim(),
           description: description.trim(),
@@ -177,9 +175,7 @@ export default function CreateAssignmentModal({
           />
         </div>
 
-        {/* Target Scope — only configurable at creation time; the backend
-            does not support changing an assignment's target scope or
-            groups after it's created. */}
+        {}
         {!isEditing && (
           <div className="space-y-2 pt-2 border-t border-[#f3f4f5]">
             <label className="block text-xs font-semibold uppercase tracking-wider text-[#414844]">

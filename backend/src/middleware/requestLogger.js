@@ -1,6 +1,3 @@
-// Lightweight request timing log: method, route, status, duration. Never
-// logs headers/body, so Authorization tokens, cookies, and passwords never
-// reach the logs.
 function requestLogger(req, res, next) {
   const start = performance.now();
   res.on('finish', () => {

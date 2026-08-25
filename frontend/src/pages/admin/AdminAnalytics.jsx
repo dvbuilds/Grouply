@@ -52,7 +52,7 @@ export default function AdminAnalytics() {
           <p className="text-xs text-[#717973]">Live data from the submissions tracker</p>
         </div>
 
-        {/* 4 Stat Cards */}
+        {}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard
             title="Total Students"
@@ -83,7 +83,7 @@ export default function AdminAnalytics() {
           />
         </div>
 
-        {/* Big Chart + Group Rankings */}
+        {}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 bg-white rounded-3xl p-6 border border-[#e1e3e4] soft-shadow space-y-4">
             <div>

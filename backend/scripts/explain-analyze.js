@@ -1,17 +1,3 @@
-// Runs EXPLAIN ANALYZE against the queries that matter most for
-// performance — the ones behind the endpoints exercised in loadtest.js —
-// against whichever database `pool.js` is currently configured for.
-//
-// Usage:
-//   npm run migrate && npm run seed   # make sure there's data to scan
-//   node scripts/explain-analyze.js
-//
-// Run it once before adding the new indexes (comment them out / roll back
-// the migration) and once after, and keep both outputs — that's the
-// before/after record section 14/17 of the hardening plan asks for.
-// Look for: "Seq Scan" on a large table (bad, usually means a missing
-// index), sort operations with high cost, and execution time.
-
 require('dotenv').config();
 const pool = require('../src/db/pool');
 

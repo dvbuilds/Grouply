@@ -39,7 +39,7 @@ export default function StudentGroups() {
       subtitle="Collaborate with your student cohort"
     >
       <div className="space-y-6 pb-12">
-        {/* Header Bar */}
+        {}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white rounded-2xl p-6 border border-[#e1e3e4] soft-shadow">
           <div>
             <h3 className="font-bold text-lg text-[#191c1d]">Active Cohorts & Teams</h3>
@@ -56,7 +56,7 @@ export default function StudentGroups() {
           </Button>
         </div>
 
-        {/* Group Cards Grid */}
+        {}
         {groups.length === 0 ? (
           <div className="bg-white rounded-3xl p-12 text-center border border-[#e1e3e4] max-w-md mx-auto my-8">
             <div className="w-16 h-16 rounded-2xl bg-[#012d1d]/10 text-[#012d1d] flex items-center justify-center mx-auto mb-4">

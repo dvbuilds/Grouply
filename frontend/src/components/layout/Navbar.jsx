@@ -9,7 +9,7 @@ export default function Navbar({ onMobileMenuToggle, isMobileMenuOpen, title, su
 
   return (
     <header className="w-full px-4 md:px-8 py-4 flex items-center justify-between z-20 shrink-0">
-      {/* Page Title / Mobile menu */}
+      {}
       <div className="flex items-center gap-3">
         <button
           onClick={onMobileMenuToggle}
@@ -26,9 +26,9 @@ export default function Navbar({ onMobileMenuToggle, isMobileMenuOpen, title, su
         </div>
       </div>
 
-      {/* Right Controls */}
+      {}
       <div className="flex items-center gap-3 md:gap-4">
-        {/* Search Bar (Desktop) */}
+        {}
         <div className="relative hidden lg:block w-64">
           <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#717973]" />
           <input
@@ -38,7 +38,7 @@ export default function Navbar({ onMobileMenuToggle, isMobileMenuOpen, title, su
           />
         </div>
 
-        {/* Notifications Button */}
+        {}
         <div className="relative">
           <button
             onClick={() => setShowNotifications(!showNotifications)}
@@ -62,7 +62,7 @@ export default function Navbar({ onMobileMenuToggle, isMobileMenuOpen, title, su
           )}
         </div>
 
-        {/* User Avatar */}
+        {}
         <div className="flex items-center gap-2">
           <div className="w-9 h-9 rounded-full bg-[#012d1d] text-white flex items-center justify-center text-xs font-bold">
             {getInitials(user?.name)}

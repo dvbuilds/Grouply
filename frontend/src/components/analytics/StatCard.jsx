@@ -8,7 +8,7 @@ export default function StatCard({
   trend,
   trendPositive = true,
   icon: Icon,
-  variant = 'white', // 'white', 'primary', 'gold', 'accent', 'tertiary'
+  variant = 'white',
   className = '',
 }) {
   if (variant === 'primary') {
@@ -116,7 +116,6 @@ export default function StatCard({
     );
   }
 
-  // Default white card with colored accent dot
   return (
     <div
       className={`bg-white rounded-2xl p-5 soft-shadow hover-lift border border-[#e1e3e4] flex flex-col justify-between h-36 relative overflow-hidden ${className}`}

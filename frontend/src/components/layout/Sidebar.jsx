@@ -53,7 +53,7 @@ export default function Sidebar({ className = '' }) {
     <aside
       className={`hidden md:flex flex-col h-screen py-6 px-4 fixed left-0 top-0 w-64 lg:w-72 bg-white/80 dark:bg-[#f8f9fa] border-r border-[#e1e3e4] backdrop-blur-xl z-30 overflow-y-auto select-none ${className}`}
     >
-      {/* Brand Header */}
+      {}
       <div className="flex items-center gap-3 px-3 mb-6">
         <div className="w-10 h-10 rounded-xl bg-[#012d1d] flex items-center justify-center text-white shadow-sm shrink-0">
           <GraduationCap className="w-5 h-5" />
@@ -68,7 +68,7 @@ export default function Sidebar({ className = '' }) {
         </div>
       </div>
 
-      {/* Navigation Links */}
+      {}
       <nav className="flex-1 flex flex-col gap-1.5 overflow-y-auto pr-1">
         {navLinks.map((item) => {
           const Icon = item.icon;
@@ -112,7 +112,7 @@ export default function Sidebar({ className = '' }) {
         })}
       </nav>
 
-      {/* Footer Area */}
+      {}
       <div className="mt-auto flex flex-col gap-3 pt-4 border-t border-[#e1e3e4]">
         <button
           onClick={() => alert('Joineazy Premium features are enabled for your institution!')}
@@ -146,7 +146,7 @@ export default function Sidebar({ className = '' }) {
           </button>
         </div>
 
-        {/* User Card */}
+        {}
         {user && (
           <div className="flex items-center gap-3 px-2 py-2 rounded-xl bg-[#f3f4f5]/60 border border-[#e1e3e4]/60">
             <div className="w-9 h-9 rounded-full bg-[#012d1d] text-white flex items-center justify-center text-xs font-bold shadow-xs">

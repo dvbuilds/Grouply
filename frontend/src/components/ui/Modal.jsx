@@ -24,18 +24,18 @@ export default function Modal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
-      {/* Backdrop */}
+      {}
       <div
         className="fixed inset-0 bg-[#191c1d]/40 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
 
-      {/* Modal Card */}
+      {}
       <div
         className={`relative w-full ${maxWidth} bg-white rounded-2xl shadow-2xl border border-[#e1e3e4] overflow-hidden z-10 transition-all transform scale-100 opacity-100 my-8`}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
+        {}
         {(title || onClose) && (
           <div className="flex items-center justify-between px-6 py-5 border-b border-[#f3f4f5] bg-[#f8f9fa]">
             <div className="flex items-center gap-3">
@@ -67,7 +67,7 @@ export default function Modal({
           </div>
         )}
 
-        {/* Content */}
+        {}
         <div className="px-6 py-5">{children}</div>
       </div>
     </div>

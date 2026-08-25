@@ -1,20 +1,9 @@
-// Populates the database with a realistic demo dataset: two professors,
-// ten students, four groups (with memberships), and four assignments with
-// a mix of pending/confirmed submissions across groups.
-//
-// Safe to run repeatedly: users are upserted by email (unique), and groups /
-// assignments / memberships / targets / submissions are looked up before
-// insert (or inserted with ON CONFLICT DO NOTHING against the schema's
-// existing unique constraints), so re-running never creates duplicates.
-//
-// Usage: npm run seed   (run after `npm run migrate`)
 require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const pool = require('./pool');
 
 const DEMO_PASSWORD = 'password123';
 
-// Upserts a user by email and returns their id.
 async function upsertUser(client, { name, email, hash, role, student_id = null }) {
   const result = await client.query(
     `INSERT INTO users (name, email, password_hash, role, student_id)
@@ -26,8 +15,6 @@ async function upsertUser(client, { name, email, hash, role, student_id = null }
   return result.rows[0].id;
 }
 
-// Groups have no unique constraint of their own, so idempotency is done by
-// looking the group up (by name + leader) before inserting.
 async function upsertGroup(client, { name, leaderId }) {
   const existing = await client.query(
     'SELECT id FROM groups WHERE name = $1 AND leader_id = $2',
@@ -50,8 +37,6 @@ async function addMember(client, groupId, userId) {
   );
 }
 
-// Assignments have no unique constraint either, so idempotency is done by
-// looking the assignment up by title (titles are distinct in this dataset).
 async function upsertAssignment(client, { title, description, dueDate, link, scope, createdBy }) {
   const existing = await client.query('SELECT id FROM assignments WHERE title = $1', [title]);
   if (existing.rows.length) return existing.rows[0].id;
@@ -97,7 +82,6 @@ async function seed() {
   try {
     await client.query('BEGIN');
 
-    // --- Admins (professors) ---
     const profSharmaId = await upsertUser(client, {
       name: 'Prof. Sharma', email: 'prof@joineazy.dev', hash, role: 'admin',
     });
@@ -105,7 +89,6 @@ async function seed() {
       name: 'Dr. Rakesh Iyer', email: 'riyer@joineazy.dev', hash, role: 'admin',
     });
 
-    // --- Students ---
     const studentDefs = [
       ['Divya Das', 'divya@joineazy.dev', 'S101'],
       ['Aarav Mehta', 'aarav@joineazy.dev', 'S102'],
@@ -124,7 +107,6 @@ async function seed() {
       s[key] = await upsertUser(client, { name, email, hash, role: 'student', student_id: studentId });
     }
 
-    // --- Groups (leader + members) ---
     const teamAlpha = await upsertGroup(client, { name: 'Team Alpha', leaderId: s.divya });
     await addMember(client, teamAlpha, s.divya);
     await addMember(client, teamAlpha, s.aarav);
@@ -143,8 +125,6 @@ async function seed() {
     await addMember(client, teamDelta, s.neha);
     await addMember(client, teamDelta, s.vikram);
 
-    // --- Assignments ---
-    // 1: targets all groups, due soon, mixed confirmation state
     const a1 = await upsertAssignment(client, {
       title: 'Database Design Assignment',
       description: 'Submit your ER diagram and normalized schema for the course project.',
@@ -159,7 +139,6 @@ async function seed() {
     await upsertSubmission(client, a1, teamAlpha, { confirmed: true, confirmedBy: s.divya, confirmedAt: new Date() });
     await upsertSubmission(client, a1, teamGamma, { confirmed: true, confirmedBy: s.rohan, confirmedAt: new Date() });
 
-    // 2: targets specific groups (Alpha + Beta), already confirmed for Alpha
     const a2 = await upsertAssignment(client, {
       title: 'React Component Library',
       description: 'Build and document 5 reusable React components with Storybook.',
@@ -173,7 +152,6 @@ async function seed() {
     await upsertSubmission(client, a2, teamAlpha, { confirmed: true, confirmedBy: s.aarav, confirmedAt: new Date() });
     await upsertSubmission(client, a2, teamBeta);
 
-    // 3: targets all groups, further out, all pending
     const a3 = await upsertAssignment(client, {
       title: 'API Security Hardening Report',
       description: 'Document the OWASP Top 10 mitigations applied to your project API.',
@@ -186,7 +164,6 @@ async function seed() {
       await upsertSubmission(client, a3, gid);
     }
 
-    // 4: targets specific groups (Gamma + Delta), one confirmed
     const a4 = await upsertAssignment(client, {
       title: 'UI/UX Design Systems Case Study',
       description: 'Present a design system audit with tokens, components, and accessibility notes.',

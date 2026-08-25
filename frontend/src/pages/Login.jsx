@@ -33,7 +33,7 @@ export default function Login() {
     } catch (err) {
       console.error(err);
       setError(
-        err.response?.data?.message || 'Invalid email or password. (Hint: password123)'
+        err.response?.data?.error || 'Invalid email or password. Please try again.'
       );
     } finally {
       setIsLoading(false);
@@ -48,12 +48,12 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-[#f8f9fa] flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Decorative ambient blobs */}
+      {}
       <div className="absolute -top-20 -left-20 w-96 h-96 bg-[#c1ecd4]/40 rounded-full blur-3xl -z-10 pointer-events-none" />
       <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-[#d3bcfc]/30 rounded-full blur-3xl -z-10 pointer-events-none" />
 
       <div className="w-full max-w-md bg-white rounded-3xl p-8 soft-shadow border border-[#e1e3e4] relative z-10">
-        {/* Brand */}
+        {}
         <div className="flex items-center justify-center gap-3 mb-6">
           <div className="w-12 h-12 rounded-2xl bg-[#012d1d] flex items-center justify-center text-white shadow-sm">
             <GraduationCap className="w-6 h-6" />
@@ -112,7 +112,7 @@ export default function Login() {
           </Button>
         </form>
 
-        {/* Quick Demo Logins Bar */}
+        {}
         <div className="mt-6 pt-6 border-t border-[#f3f4f5]">
           <p className="text-[11px] font-semibold text-[#717973] uppercase tracking-wider text-center mb-3">
             Quick Fill Demo Accounts:

@@ -25,7 +25,6 @@ export default function ProtectedRoute({ children, allowedRole }) {
   }
 
   if (allowedRole && user.role !== allowedRole) {
-    // If student attempts to access admin route or vice-versa
     const defaultPath = user.role === 'admin' ? '/admin/dashboard' : '/student/dashboard';
     return <Navigate to={defaultPath} replace />;
   }

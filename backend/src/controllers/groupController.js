@@ -3,7 +3,6 @@ const AppError = require('../utils/AppError');
 const asyncHandler = require('../utils/asyncHandler');
 const { parsePagination, setPaginationHeaders } = require('../utils/pagination');
 
-// Student creates a group and automatically becomes its first member (leader)
 const createGroup = asyncHandler(async (req, res) => {
   const { name } = req.body;
 
@@ -28,7 +27,6 @@ const createGroup = asyncHandler(async (req, res) => {
   }
 });
 
-// Add a member by email or student_id — only the leader can add members
 const addMember = asyncHandler(async (req, res) => {
   const { groupId } = req.params;
   const { email, student_id } = req.body;
@@ -54,7 +52,6 @@ const addMember = asyncHandler(async (req, res) => {
   res.status(201).json({ message: 'Member added' });
 });
 
-// Leader removes a member (cannot remove the leader themselves — use deleteGroup for that)
 const removeMember = asyncHandler(async (req, res) => {
   const { groupId, userId } = req.params;
 
@@ -71,7 +68,6 @@ const removeMember = asyncHandler(async (req, res) => {
   res.json({ message: 'Member removed' });
 });
 
-// A non-leader member removes themselves from the group
 const leaveGroup = asyncHandler(async (req, res) => {
   const { groupId } = req.params;
 
@@ -89,7 +85,6 @@ const leaveGroup = asyncHandler(async (req, res) => {
   res.json({ message: 'You left the group' });
 });
 
-// Leader deletes the group entirely (cascades to memberships, targets, and submissions)
 const deleteGroup = asyncHandler(async (req, res) => {
   const { groupId } = req.params;
 
@@ -103,7 +98,6 @@ const deleteGroup = asyncHandler(async (req, res) => {
   res.json({ message: 'Group deleted' });
 });
 
-// Groups the logged-in student belongs to (naturally small — one user's own memberships)
 const myGroups = asyncHandler(async (req, res) => {
   const result = await pool.query(
     `SELECT g.*, 
@@ -116,8 +110,6 @@ const myGroups = asyncHandler(async (req, res) => {
   res.json(result.rows);
 });
 
-// Member list for one group — restricted to admins and that group's own
-// members, so a student can't enumerate the roster of a group they're not in.
 const groupMembers = asyncHandler(async (req, res) => {
   const { groupId } = req.params;
 
@@ -140,9 +132,6 @@ const groupMembers = asyncHandler(async (req, res) => {
   res.json(result.rows);
 });
 
-// Admin: list every group with member count (for the analytics dashboard).
-// Bounded + paginated (via X-Total-Count/X-Page/etc headers) since the
-// number of groups grows with enrollment and shouldn't be loaded unbounded.
 const allGroups = asyncHandler(async (req, res) => {
   const pagination = parsePagination(req.query);
 

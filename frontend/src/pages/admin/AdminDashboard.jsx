@@ -55,9 +55,6 @@ export default function AdminDashboard() {
     ? Math.round((totals.confirmed_submissions / totals.total_submissions) * 100)
     : 0;
 
-  // Build a lookup of assignment id -> completion % from the per-assignment
-  // analytics, so the "Active Coursework" table and the bar chart share the
-  // same real numbers.
   const completionByAssignmentId = {};
   (analytics?.perAssignment || []).forEach((a) => {
     completionByAssignmentId[a.id] = a.target_groups
@@ -82,7 +79,7 @@ export default function AdminDashboard() {
       subtitle="Institutional Analytics & Assignment Operations"
     >
       <div className="space-y-6 pb-12">
-        {/* Quick Action Header */}
+        {}
         <div className="bg-white rounded-3xl p-6 border border-[#e1e3e4] soft-shadow flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
             <h3 className="font-bold text-lg text-[#191c1d]">Course Overview & Controls</h3>
@@ -108,7 +105,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* 4 Bento Stat Cards */}
+        {}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard
             title="Total Students"
@@ -139,9 +136,9 @@ export default function AdminDashboard() {
           />
         </div>
 
-        {/* Charts Grid */}
+        {}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Assignment Completion Chart (2 cols) */}
+          {}
           <div className="lg:col-span-2 bg-white rounded-3xl p-6 border border-[#e1e3e4] soft-shadow">
             <div className="flex items-center justify-between mb-4">
               <div>
@@ -164,7 +161,7 @@ export default function AdminDashboard() {
             <CompletionBarChart data={completionChartData} />
           </div>
 
-          {/* Group Performance (1 col) */}
+          {}
           <div className="bg-white rounded-3xl p-6 border border-[#e1e3e4] soft-shadow flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-4">
@@ -193,7 +190,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Recent Submissions & Assignments Table */}
+        {}
         <div className="bg-white rounded-3xl p-6 border border-[#e1e3e4] soft-shadow">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-bold text-base text-[#191c1d]">Active Coursework</h3>

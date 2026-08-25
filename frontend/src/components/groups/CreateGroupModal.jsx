@@ -28,7 +28,7 @@ export default function CreateGroupModal({ isOpen, onClose, onGroupCreated }) {
       console.error(err);
       setError(
         err.response?.data?.details?.[0]?.message ||
-          err.response?.data?.message ||
+          err.response?.data?.error ||
           'Failed to create group. Please try again.'
       );
     } finally {

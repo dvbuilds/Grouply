@@ -18,12 +18,11 @@ export default function AdminSubmissionTracking() {
 
   const [assignments, setAssignments] = useState([]);
   const [selectedAssignmentId, setSelectedAssignmentId] = useState(initialAssignmentId);
-  const [viewMode, setViewMode] = useState('groups'); // 'groups' | 'students'
+  const [viewMode, setViewMode] = useState('groups');
   const [groupSubmissions, setGroupSubmissions] = useState([]);
   const [studentSubmissions, setStudentSubmissions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch list of all assignments for selector
   useEffect(() => {
     const fetchAssignments = async () => {
       try {
@@ -39,7 +38,6 @@ export default function AdminSubmissionTracking() {
     fetchAssignments();
   }, []);
 
-  // Fetch submissions whenever selected assignment or viewMode changes
   useEffect(() => {
     if (!selectedAssignmentId) return;
 
@@ -78,7 +76,7 @@ export default function AdminSubmissionTracking() {
       subtitle="Verify group and individual student submissions in real-time"
     >
       <div className="space-y-6 pb-12">
-        {/* Top Assignment Selector Card */}
+        {}
         <div className="bg-white rounded-3xl p-6 border border-[#e1e3e4] soft-shadow flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-1">
             <label className="block text-[11px] font-bold text-[#717973] uppercase tracking-wider">
@@ -97,7 +95,7 @@ export default function AdminSubmissionTracking() {
             </select>
           </div>
 
-          {/* Quick Metrics */}
+          {}
           <div className="flex items-center gap-6 bg-[#f8f9fa] p-4 rounded-2xl border border-[#e1e3e4]">
             <div>
               <p className="text-[11px] text-[#717973] uppercase font-bold">Group Completion</p>
@@ -111,7 +109,7 @@ export default function AdminSubmissionTracking() {
           </div>
         </div>
 
-        {/* View Mode Switcher and Controls */}
+        {}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-2 bg-white border border-[#e1e3e4] p-1 rounded-2xl soft-shadow">
             <button
@@ -148,10 +146,9 @@ export default function AdminSubmissionTracking() {
           </Button>
         </div>
 
-        {/* Table Content */}
+        {}
         <div className="bg-white rounded-3xl border border-[#e1e3e4] overflow-hidden soft-shadow">
           {viewMode === 'groups' ? (
-            /* Groups View */
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
@@ -207,7 +204,6 @@ export default function AdminSubmissionTracking() {
               </table>
             </div>
           ) : (
-            /* Students View */
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>

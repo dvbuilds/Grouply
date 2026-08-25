@@ -80,7 +80,7 @@ export default function StudentAssignmentDetail() {
       subtitle="Coursework Details"
     >
       <div className="space-y-6 pb-16">
-        {/* Back navigation */}
+        {}
         <button
           onClick={() => navigate('/student/assignments')}
           className="inline-flex items-center gap-2 text-xs font-semibold text-[#414844] hover:text-[#012d1d] transition-colors"
@@ -89,7 +89,7 @@ export default function StudentAssignmentDetail() {
           <span>Back to Assignments</span>
         </button>
 
-        {/* Hero header */}
+        {}
         <div className="bg-white rounded-3xl p-6 md:p-8 border border-[#e1e3e4] soft-shadow flex flex-col md:flex-row justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
             <div className="flex flex-wrap items-center gap-2">
@@ -116,7 +116,7 @@ export default function StudentAssignmentDetail() {
             </p>
           </div>
 
-          {/* Quick Metrics */}
+          {}
           <div className="flex md:flex-col justify-end items-end gap-3 text-right">
             <div className="bg-[#f8f9fa] p-4 rounded-2xl border border-[#e1e3e4] w-full md:w-56 text-left">
               <p className="text-[11px] text-[#717973] uppercase font-semibold">Deadline</p>
@@ -139,9 +139,9 @@ export default function StudentAssignmentDetail() {
           </div>
         </div>
 
-        {/* Main Grid: Details on Left, Submission Box on Right */}
+        {}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column */}
+          {}
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-white rounded-3xl p-6 border border-[#e1e3e4] soft-shadow space-y-4 text-xs md:text-sm text-[#414844] leading-relaxed">
               <h4 className="font-bold text-base text-[#191c1d]">Assignment Overview</h4>
@@ -165,7 +165,7 @@ export default function StudentAssignmentDetail() {
             </div>
           </div>
 
-          {/* Right Column: Submission Action Box */}
+          {}
           <div className="space-y-6">
             <div className="bg-white rounded-3xl p-6 border border-[#e1e3e4] soft-shadow">
               <h3 className="font-bold text-base text-[#191c1d] mb-1">Assignment Submission</h3>
@@ -222,7 +222,7 @@ export default function StudentAssignmentDetail() {
         </div>
       </div>
 
-      {/* Confirmation Modal */}
+      {}
       {assignment?.group_id && (
         <SubmissionConfirmModal
           isOpen={isConfirmModalOpen}

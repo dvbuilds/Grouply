@@ -16,11 +16,8 @@ const analyticsRoutes = require('./routes/analyticsRoutes');
 
 const app = express();
 
-// Sets secure-by-default HTTP headers (X-Content-Type-Options, HSTS, etc).
 app.use(helmet());
 
-// Only the configured frontend origin(s) may call the API with credentials.
-// FRONTEND_URL supports a comma-separated list for multi-env setups.
 const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173')
   .split(',')
   .map((o) => o.trim())
@@ -28,7 +25,6 @@ const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173')
 
 app.use(cors({
   origin(origin, callback) {
-    // Allow non-browser tools / server-to-server calls with no Origin header.
     if (!origin || allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
@@ -39,9 +35,6 @@ app.use(cors({
 app.use(express.json());
 app.use(requestLogger);
 
-// Health check: confirms the process is up and that it can actually reach
-// PostgreSQL, without doing any expensive work — useful for container /
-// deployment troubleshooting (e.g. Docker HEALTHCHECK).
 app.get('/api/health', asyncHandler(async (req, res) => {
   try {
     await pool.query('SELECT 1');
@@ -52,8 +45,6 @@ app.get('/api/health', asyncHandler(async (req, res) => {
   }
 }));
 
-// General limiter for everything under /api; authRoutes additionally
-// applies a stricter limiter to just /login and /register internally.
 app.use('/api', apiLimiter);
 
 app.use('/api/auth', authRoutes);

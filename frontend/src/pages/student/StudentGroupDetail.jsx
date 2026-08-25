@@ -85,7 +85,7 @@ export default function StudentGroupDetail() {
       navigate('/student/groups');
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.message || 'Failed to leave group');
+      alert(err.response?.data?.error || 'Failed to leave group');
     } finally {
       setIsActionLoading(false);
     }
@@ -99,7 +99,7 @@ export default function StudentGroupDetail() {
       navigate('/student/groups');
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.message || 'Failed to delete group');
+      alert(err.response?.data?.error || 'Failed to delete group');
     } finally {
       setIsActionLoading(false);
     }
@@ -111,7 +111,7 @@ export default function StudentGroupDetail() {
       subtitle="Group Roster & Assignment Progress"
     >
       <div className="space-y-6 pb-12">
-        {/* Back Link */}
+        {}
         <button
           onClick={() => navigate('/student/groups')}
           className="inline-flex items-center gap-2 text-xs font-semibold text-[#414844] hover:text-[#012d1d] transition-colors"
@@ -120,7 +120,7 @@ export default function StudentGroupDetail() {
           <span>Back to My Groups</span>
         </button>
 
-        {/* Group Header Hero */}
+        {}
         <div className="bg-white rounded-3xl p-6 md:p-8 border border-[#e1e3e4] soft-shadow flex flex-col md:flex-row justify-between gap-6">
           <div className="flex items-start gap-4">
             <div className="w-16 h-16 rounded-2xl bg-[#012d1d] text-white flex items-center justify-center font-bold text-2xl shadow-sm shrink-0">
@@ -147,7 +147,7 @@ export default function StudentGroupDetail() {
             </div>
           </div>
 
-          {/* Action Buttons */}
+          {}
           <div className="flex flex-wrap items-center gap-3">
             {isLeader ? (
               <>
@@ -180,7 +180,7 @@ export default function StudentGroupDetail() {
           </div>
         </div>
 
-        {/* Group Assignment Progress Card */}
+        {}
         {progress && (
           <div className="bg-white rounded-2xl p-6 border border-[#e1e3e4] soft-shadow">
             <div className="flex items-center justify-between mb-4">
@@ -200,7 +200,7 @@ export default function StudentGroupDetail() {
           </div>
         )}
 
-        {/* Group Members Section */}
+        {}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -229,7 +229,7 @@ export default function StudentGroupDetail() {
         </div>
       </div>
 
-      {/* Add Member Modal */}
+      {}
       <AddMemberModal
         isOpen={isAddOpen}
         onClose={() => setIsAddOpen(false)}
@@ -238,7 +238,7 @@ export default function StudentGroupDetail() {
         onMemberAdded={() => fetchGroupDetails()}
       />
 
-      {/* Delete Group Modal */}
+      {}
       <ConfirmDialog
         isOpen={isDeleteOpen}
         onClose={() => setIsDeleteOpen(false)}
@@ -250,7 +250,7 @@ export default function StudentGroupDetail() {
         isLoading={isActionLoading}
       />
 
-      {/* Leave Group Modal */}
+      {}
       <ConfirmDialog
         isOpen={isLeaveOpen}
         onClose={() => setIsLeaveOpen(false)}

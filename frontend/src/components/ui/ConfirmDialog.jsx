@@ -11,7 +11,7 @@ export default function ConfirmDialog({
   message,
   confirmText = 'Confirm',
   cancelText = 'Cancel',
-  variant = 'danger', // 'danger', 'primary', 'success'
+  variant = 'danger',
   isLoading = false,
   details,
 }) {

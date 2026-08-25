@@ -66,7 +66,7 @@ export default function AdminGroups() {
       subtitle="Overview of all student cohorts and leaders"
     >
       <div className="space-y-6 pb-12">
-        {/* Controls Bar */}
+        {}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white rounded-2xl p-6 border border-[#e1e3e4] soft-shadow">
           <div>
             <h3 className="font-bold text-lg text-[#191c1d]">Cohort Roster</h3>
@@ -84,7 +84,7 @@ export default function AdminGroups() {
           </div>
         </div>
 
-        {/* Groups Grid */}
+        {}
         {isLoading ? (
           <div className="text-center py-20 text-[#717973] text-sm">Loading groups...</div>
         ) : filteredGroups.length === 0 ? (
@@ -136,7 +136,7 @@ export default function AdminGroups() {
         )}
       </div>
 
-      {/* Members Modal */}
+      {}
       <Modal
         isOpen={isMembersModalOpen}
         onClose={() => setIsMembersModalOpen(false)}

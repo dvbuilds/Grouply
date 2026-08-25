@@ -115,7 +115,7 @@ export default function GroupMembersTable({
         </div>
       </div>
 
-      {/* Confirmation Dialog */}
+      {}
       <ConfirmDialog
         isOpen={!!memberToRemove}
         onClose={() => setMemberToRemove(null)}

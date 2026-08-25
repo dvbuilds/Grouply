@@ -12,7 +12,7 @@ export default function Register() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('student'); // 'student' | 'admin'
+  const [role, setRole] = useState('student');
   const [studentId, setStudentId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -44,7 +44,7 @@ export default function Register() {
       console.error(err);
       setError(
         err.response?.data?.details?.[0]?.message ||
-          err.response?.data?.message ||
+          err.response?.data?.error ||
           'Registration failed. Please check your information.'
       );
     } finally {
@@ -83,7 +83,7 @@ export default function Register() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Role selector */}
+          {}
           <div className="space-y-1.5">
             <label className="block text-xs font-semibold uppercase tracking-wider text-[#414844]">
               Account Type

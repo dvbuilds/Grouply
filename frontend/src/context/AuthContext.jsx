@@ -15,8 +15,6 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(getStoredToken());
   const [isLoading, setIsLoading] = useState(true);
 
-  // On mount, verify any stored token against the backend so a stale or
-  // revoked token doesn't leave the app in a falsely-authenticated state.
   useEffect(() => {
     const initAuth = async () => {
       const savedToken = getStoredToken();

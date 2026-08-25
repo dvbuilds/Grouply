@@ -4,12 +4,6 @@ const { signToken } = require('../utils/jwt');
 const AppError = require('../utils/AppError');
 const asyncHandler = require('../utils/asyncHandler');
 
-// NOTE: public registration allows choosing role: 'admin' — this is an
-// existing, intentional product feature (see frontend Register.jsx: "Join
-// your student cohort or access professor administration"), not something
-// introduced or changed here. Flagged in the hardening summary as worth a
-// product decision, but left as-is per "keep existing features exactly as
-// they are."
 const register = asyncHandler(async (req, res) => {
   const { name, email, password, role, student_id } = req.body;
   const safeRole = role === 'admin' ? 'admin' : 'student';

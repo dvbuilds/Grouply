@@ -79,7 +79,7 @@ export default function AdminAssignments() {
       subtitle="Create, configure, and monitor course assignments"
     >
       <div className="space-y-6 pb-12">
-        {/* Controls Header */}
+        {}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white rounded-2xl p-6 border border-[#e1e3e4] soft-shadow">
           <div>
             <h3 className="font-bold text-lg text-[#191c1d]">Course Assignments</h3>
@@ -112,7 +112,7 @@ export default function AdminAssignments() {
           </div>
         </div>
 
-        {/* Assignments Table */}
+        {}
         <div className="bg-white rounded-3xl border border-[#e1e3e4] overflow-hidden soft-shadow">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
@@ -206,7 +206,7 @@ export default function AdminAssignments() {
         </div>
       </div>
 
-      {/* Create / Edit Assignment Modal */}
+      {}
       <CreateAssignmentModal
         isOpen={isCreateOpen}
         onClose={() => {
@@ -218,7 +218,7 @@ export default function AdminAssignments() {
         onSaved={() => fetchData()}
       />
 
-      {/* Delete Confirmation Dialog */}
+      {}
       <ConfirmDialog
         isOpen={!!assignmentToDelete}
         onClose={() => setAssignmentToDelete(null)}

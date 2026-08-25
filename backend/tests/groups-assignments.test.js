@@ -34,7 +34,7 @@ describe('POST /api/groups/:groupId/members', () => {
 
 describe('DELETE /api/groups/:groupId/members/:userId', () => {
   it('refuses to let a non-leader remove a member', async () => {
-    pool.query.mockResolvedValueOnce({ rows: [{ id: 1, leader_id: 99 }] }); // leader is someone else
+    pool.query.mockResolvedValueOnce({ rows: [{ id: 1, leader_id: 99 }] });
     const res = await request(app)
       .delete('/api/groups/1/members/5')
       .set('Authorization', `Bearer ${studentToken}`);
@@ -42,7 +42,7 @@ describe('DELETE /api/groups/:groupId/members/:userId', () => {
   });
 
   it('refuses to remove the leader themselves', async () => {
-    pool.query.mockResolvedValueOnce({ rows: [{ id: 1, leader_id: 1 }] }); // req.user.id === 1
+    pool.query.mockResolvedValueOnce({ rows: [{ id: 1, leader_id: 1 }] });
     const res = await request(app)
       .delete('/api/groups/1/members/1')
       .set('Authorization', `Bearer ${studentToken}`);

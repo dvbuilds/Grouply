@@ -3,12 +3,6 @@ const AppError = require('../utils/AppError');
 const asyncHandler = require('../utils/asyncHandler');
 const { parsePagination, setPaginationHeaders } = require('../utils/pagination');
 
-// Step 1: student clicks "Yes, I have submitted" -> frontend just shows a
-// confirm dialog; the actual state change happens on step 2 (confirmSubmission)
-// so nothing here needs its own endpoint — this comment documents the flow.
-
-// Step 2: final confirm. Only a member of the group may confirm, and only
-// for assignments that target that group.
 const confirmSubmission = asyncHandler(async (req, res) => {
   const { assignmentId, groupId } = req.params;
 
@@ -33,9 +27,6 @@ const confirmSubmission = asyncHandler(async (req, res) => {
   res.json(result.rows[0]);
 });
 
-// A group's submission status across all its assignments, for the student's
-// own progress bar. Restricted to admins and that group's own members —
-// previously any authenticated user could view any group's progress by id.
 const groupProgress = asyncHandler(async (req, res) => {
   const { groupId } = req.params;
 
@@ -65,8 +56,6 @@ const groupProgress = asyncHandler(async (req, res) => {
   });
 });
 
-// Admin: every group's status for one assignment. Bounded to the number of
-// groups targeted by a single assignment, but still paginated defensively.
 const assignmentSubmissions = asyncHandler(async (req, res) => {
   const { assignmentId } = req.params;
   const pagination = parsePagination(req.query);
@@ -89,10 +78,6 @@ const assignmentSubmissions = asyncHandler(async (req, res) => {
   res.json(result.rows);
 });
 
-// Admin: student-wise view for one assignment — every student in a targeted
-// group, with the confirmation status inherited from their group (submission
-// is a group action, but the admin still needs to see it per student, e.g.
-// to know who is in an unconfirmed group).
 const assignmentStudentStatus = asyncHandler(async (req, res) => {
   const { assignmentId } = req.params;
   const pagination = parsePagination(req.query);

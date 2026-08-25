@@ -19,7 +19,7 @@ export default function StudentAssignments() {
   const navigate = useNavigate();
 
   const [assignments, setAssignments] = useState([]);
-  const [filterStatus, setFilterStatus] = useState('all'); // 'all' | 'pending' | 'submitted'
+  const [filterStatus, setFilterStatus] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
@@ -60,9 +60,9 @@ export default function StudentAssignments() {
       subtitle="Track deadlines, resources, and team submissions"
     >
       <div className="space-y-6 pb-12">
-        {/* Controls bar */}
+        {}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white rounded-2xl p-4 md:p-6 border border-[#e1e3e4] soft-shadow">
-          {/* Status Filter Tabs */}
+          {}
           <div className="flex items-center gap-1.5 bg-[#f3f4f5] p-1 rounded-xl">
             <button
               onClick={() => setFilterStatus('all')}
@@ -96,7 +96,7 @@ export default function StudentAssignments() {
             </button>
           </div>
 
-          {/* Search Box */}
+          {}
           <div className="relative w-full sm:w-64">
             <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#717973]" />
             <input
@@ -109,7 +109,7 @@ export default function StudentAssignments() {
           </div>
         </div>
 
-        {/* Assignments Grid */}
+        {}
         {filteredAssignments.length === 0 ? (
           <div className="bg-white rounded-3xl p-12 text-center border border-[#e1e3e4] max-w-md mx-auto my-8">
             <div className="w-16 h-16 rounded-2xl bg-[#012d1d]/10 text-[#012d1d] flex items-center justify-center mx-auto mb-4">
@@ -133,7 +133,7 @@ export default function StudentAssignments() {
                   className="bg-white rounded-3xl p-6 soft-shadow hover-lift border border-[#e1e3e4] flex flex-col justify-between"
                 >
                   <div>
-                    {/* Header: Group Tag & Status */}
+                    {}
                     <div className="flex justify-between items-start mb-3">
                       <span className="text-[11px] font-bold text-[#012d1d] bg-[#012d1d]/10 px-2.5 py-1 rounded-full">
                         {assignment.group_name || 'Assigned Group'}

@@ -1,5 +1,3 @@
-// Token & Local Storage utilities
-
 const TOKEN_KEY = 'joineazy_token';
 const USER_KEY = 'joineazy_user';
 

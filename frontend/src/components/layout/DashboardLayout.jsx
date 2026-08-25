@@ -8,14 +8,14 @@ export default function DashboardLayout({ children, title, subtitle }) {
 
   return (
     <div className="min-h-screen bg-[#f8f9fa] text-[#191c1d] flex overflow-hidden relative">
-      {/* Ambient background decoration blobs */}
+      {}
       <div className="fixed top-[-10%] right-[-5%] w-[45vw] h-[45vw] max-w-[600px] max-h-[600px] bg-[#d3bcfc]/20 rounded-full blur-3xl -z-10 pointer-events-none" />
       <div className="fixed bottom-[-10%] left-[20%] w-[35vw] h-[35vw] max-w-[500px] max-h-[500px] bg-[#a5d0b9]/25 rounded-full blur-3xl -z-10 pointer-events-none" />
 
-      {/* Desktop Sidebar */}
+      {}
       <Sidebar />
 
-      {/* Mobile Drawer */}
+      {}
       {isMobileMenuOpen && (
         <div className="md:hidden fixed inset-0 z-50 flex">
           <div
@@ -28,7 +28,7 @@ export default function DashboardLayout({ children, title, subtitle }) {
         </div>
       )}
 
-      {/* Main Content Area */}
+      {}
       <div className="flex-1 flex flex-col h-screen overflow-y-auto md:ml-64 lg:ml-72 pb-16 md:pb-6">
         <Navbar
           title={title}
@@ -41,7 +41,7 @@ export default function DashboardLayout({ children, title, subtitle }) {
         </main>
       </div>
 
-      {/* Mobile Bottom Bar */}
+      {}
       <MobileNav />
     </div>
   );

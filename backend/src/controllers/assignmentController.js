@@ -3,9 +3,6 @@ const AppError = require('../utils/AppError');
 const asyncHandler = require('../utils/asyncHandler');
 const { parsePagination, setPaginationHeaders } = require('../utils/pagination');
 
-// Admin creates an assignment, optionally scoped to specific groups.
-// A `submissions` row is pre-created per target group so progress can be
-// tracked from 'pending' without extra logic later.
 const createAssignment = asyncHandler(async (req, res) => {
   const { title, description, due_date, onedrive_link, target_scope, group_ids } = req.body;
 
@@ -68,7 +65,6 @@ const updateAssignment = asyncHandler(async (req, res) => {
   res.json(result.rows[0]);
 });
 
-// Admin deletes an assignment (cascades to its targets and submissions)
 const deleteAssignment = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const result = await pool.query('DELETE FROM assignments WHERE id = $1 RETURNING id', [id]);
@@ -76,9 +72,6 @@ const deleteAssignment = asyncHandler(async (req, res) => {
   res.json({ message: 'Assignment deleted' });
 });
 
-// Assignments visible to the logged-in student: those targeting 'all',
-// plus those scoped to a group the student belongs to. Scoped to one
-// student's own visibility, so left unpaginated (naturally small).
 const studentAssignments = asyncHandler(async (req, res) => {
   const result = await pool.query(
     `SELECT DISTINCT a.*
@@ -92,8 +85,6 @@ const studentAssignments = asyncHandler(async (req, res) => {
   res.json(result.rows);
 });
 
-// Admin: every assignment. Bounded + paginated since this grows over a
-// semester and should never be loaded unbounded into memory/the browser.
 const allAssignments = asyncHandler(async (req, res) => {
   const pagination = parsePagination(req.query);
 

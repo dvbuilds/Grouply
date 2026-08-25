@@ -67,9 +67,9 @@ export default function StudentDashboard() {
       subtitle="Student Dashboard"
     >
       <div className="flex flex-col lg:flex-row gap-6 pb-12">
-        {/* Left Column (Main Feed) */}
+        {}
         <div className="flex-1 flex flex-col gap-6">
-          {/* Hero Banner */}
+          {}
           <div className="bg-[#012d1d] text-white rounded-3xl p-6 md:p-8 relative overflow-hidden soft-shadow">
             <div className="absolute -right-16 -bottom-16 w-80 h-80 bg-[#1b4332] rounded-full blur-3xl opacity-60 pointer-events-none" />
             <div className="relative z-10 max-w-md">
@@ -111,7 +111,7 @@ export default function StudentDashboard() {
             </div>
           </div>
 
-          {/* Bento Grid Stats — real numbers from the student's own data */}
+          {}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-[#ffb702] rounded-2xl p-5 soft-shadow hover-lift flex flex-col justify-between h-36 text-[#6b4b00]">
               <div className="flex items-center gap-2 font-semibold text-xs uppercase tracking-wide text-[#6b4b00]">
@@ -151,7 +151,7 @@ export default function StudentDashboard() {
             </div>
           </div>
 
-          {/* Upcoming Assignments */}
+          {}
           <div className="mt-2 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -214,7 +214,7 @@ export default function StudentDashboard() {
           </div>
         </div>
 
-        {/* Right Column: Homework Progress Widget */}
+        {}
         <div className="w-full lg:w-80 shrink-0 flex flex-col gap-6">
           <div className="bg-white/90 backdrop-blur-md rounded-3xl p-6 soft-shadow border border-[#e1e3e4] flex-1">
             <div className="flex items-center justify-between mb-4">

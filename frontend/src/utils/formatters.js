@@ -1,5 +1,3 @@
-// Utility formatters for dates, percentages, badges, and avatars
-
 export const formatDate = (dateString) => {
   if (!dateString) return 'N/A';
   try {

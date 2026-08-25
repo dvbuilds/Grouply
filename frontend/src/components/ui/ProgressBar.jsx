@@ -4,7 +4,7 @@ export default function ProgressBar({
   value = 0,
   max = 100,
   size = 'md',
-  color = 'auto', // 'auto', 'primary', 'success', 'warning', 'error', 'accent'
+  color = 'auto',
   showLabel = false,
   className = '',
 }) {
@@ -16,10 +16,11 @@ export default function ProgressBar({
     if (color === 'warning') return 'bg-[#FB8500]';
     if (color === 'error') return 'bg-[#D90429]';
     if (color === 'accent') return 'bg-[#4361EE]';
-    if (color === 'gold') return 'bg-[#ffb702]';
+    if (color === 'gold')
+      return 'bg-[#ffb702]';
 
-    // Auto calculate by percentage
-    if (percentage >= 80) return 'bg-[#2D6A4F]';
+    if (percentage >= 80)
+      return 'bg-[#2D6A4F]';
     if (percentage >= 40) return 'bg-[#4361EE]';
     if (percentage > 0) return 'bg-[#FB8500]';
     return 'bg-[#717973]';

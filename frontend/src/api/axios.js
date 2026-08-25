@@ -11,7 +11,6 @@ const api = axios.create({
   timeout: 15000,
 });
 
-// Attach JWT token to all outgoing requests
 api.interceptors.request.use(
   (config) => {
     const token = getStoredToken();
@@ -23,8 +22,6 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// On a 401 from the backend (missing/expired/invalid token), clear the
-// local session and send the user back to login.
 api.interceptors.response.use(
   (response) => response,
   (error) => {

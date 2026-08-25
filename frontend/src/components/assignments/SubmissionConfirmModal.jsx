@@ -35,7 +35,7 @@ export default function SubmissionConfirmModal({
     } catch (err) {
       console.error(err);
       setError(
-        err.response?.data?.message ||
+        err.response?.data?.error ||
           'Failed to confirm submission. Please try again.'
       );
       setIsSubmitting(false);

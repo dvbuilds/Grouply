@@ -1,11 +1,5 @@
 const { Pool } = require('pg');
 
-// A single shared connection pool for the whole process — every query goes
-// through `pool.query(...)` (or a checked-out client for transactions)
-// instead of opening a fresh connection per request.
-//
-// DATABASE_URL wins if set (common in hosted Postgres / Docker setups);
-// otherwise falls back to the discrete DB_* vars.
 const poolConfig = process.env.DATABASE_URL
   ? {
       connectionString: process.env.DATABASE_URL,
@@ -27,8 +21,6 @@ const pool = new Pool({
 });
 
 pool.on('error', (err) => {
-  // Errors on idle clients in the pool (e.g. DB restart) shouldn't crash
-  // the whole process — log and let the next query pick up a fresh client.
   console.error('Unexpected error on idle PostgreSQL client', err);
 });
 

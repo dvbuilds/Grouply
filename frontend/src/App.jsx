@@ -3,25 +3,21 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import ProtectedRoute from './routes/ProtectedRoute.jsx';
 
-// Auth Pages
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 
-// Student Pages
 import StudentDashboard from './pages/student/StudentDashboard.jsx';
 import StudentGroups from './pages/student/StudentGroups.jsx';
 import StudentGroupDetail from './pages/student/StudentGroupDetail.jsx';
 import StudentAssignments from './pages/student/StudentAssignments.jsx';
 import StudentAssignmentDetail from './pages/student/StudentAssignmentDetail.jsx';
 
-// Admin Pages
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 import AdminGroups from './pages/admin/AdminGroups.jsx';
 import AdminAssignments from './pages/admin/AdminAssignments.jsx';
 import AdminSubmissionTracking from './pages/admin/AdminSubmissionTracking.jsx';
 import AdminAnalytics from './pages/admin/AdminAnalytics.jsx';
 
-// Root index redirector
 function RootRedirect() {
   const { user, isAuthenticated, isLoading } = useAuth();
 
@@ -49,11 +45,11 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* Public Authentication Routes */}
+          {}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          {/* Student Routes */}
+          {}
           <Route
             path="/student/dashboard"
             element={
@@ -95,7 +91,7 @@ export default function App() {
             }
           />
 
-          {/* Admin Routes */}
+          {}
           <Route
             path="/admin/dashboard"
             element={
@@ -137,7 +133,7 @@ export default function App() {
             }
           />
 
-          {/* Root & Catch-all */}
+          {}
           <Route path="/" element={<RootRedirect />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
