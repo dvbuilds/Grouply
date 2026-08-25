@@ -110,11 +110,6 @@ erDiagram
 *(GitHub renders this automatically. If you're viewing it somewhere that doesn't, paste
 the block into [Mermaid Live](https://mermaid.live).)*
 
-One decision worth calling out: a `submissions` row gets created for every
-(assignment, group) pair the moment the assignment is posted — status `pending` —
-instead of only creating a row once someone confirms. That way "hasn't submitted yet" is
-just a row sitting there, not something the admin dashboard has to infer by comparing
-against the group count. Makes the progress queries a single `COUNT(...) FILTER (...)`.
 
 ## API
 
@@ -150,8 +145,6 @@ array (field + message) instead of a stack trace.
 
 ### Env vars
 
-There's no `.env.example` checked in yet, so just create `backend/.env` yourself:
-
 ```
 PORT=5000
 JWT_SECRET=replace-me-with-something-long
@@ -163,19 +156,14 @@ DB_NAME=joineazy
 FRONTEND_URL=http://localhost:3000
 ```
 
-`FRONTEND_URL` matters more than it looks — it's what the backend's CORS check allows.
-The frontend actually runs on **port 3000** (see `vite.config.js`), not 5173, so make sure
-this is set correctly or you'll get CORS errors instead of a login screen. This tripped
-me up once already — see Known Issues below.
-
 ### With Docker
 
 ```bash
 docker compose up --build
 ```
-- Frontend: http://localhost:3000 (docker-compose currently maps `5173:5173`, which is
+- Frontend: [http://localhost:3000](https://grouply-psi.vercel.app/login) (docker-compose currently maps `5173:5173`, which is
   stale — see below)
-- Backend: http://localhost:5000/api
+- Backend: [http://localhost:5000/api](https://grouply-g2v9.onrender.com)
 - Postgres runs `schema.sql` automatically on first boot.
 - Seed some demo data: `docker compose exec backend npm run seed`
 
@@ -197,8 +185,6 @@ npm run dev
 
 ### Demo logins (after `npm run seed`)
 
-Everyone's password is `password123`.
-
 | Role | Email | Notes |
 |---|---|---|
 | Admin | `prof@joineazy.dev` | Posted most of the demo assignments |
@@ -209,8 +195,6 @@ Everyone's password is `password123`.
 | Student | `rohan@joineazy.dev` | Leader of Team Gamma |
 | Student | `neha@joineazy.dev` | Leader of Team Delta |
 
-(there are a few more seeded students spread across the four groups if you want a
-fuller-looking demo)
 
 ### Tests
 
@@ -219,20 +203,6 @@ cd backend
 npm test
 ```
 
-18 tests, covering auth, the JWT/role middleware, and group/assignment validation. The
-DB layer is mocked (`jest.mock('../src/db/pool')`), so you don't need a real Postgres
-instance running just to run the suite.
-
-## Known issues
-
-- **Port mismatch.** `docker-compose.yml` and `frontend/Dockerfile` both still reference
-  port 5173 for the frontend, but `vite.config.js` runs the dev server on 3000. Works fine
-  running frontend/backend separately outside Docker since you just hit whatever port Vite
-  actually printed, but the Docker port mapping needs fixing (`5173:5173` → `3000:3000`)
-  before `docker compose up` will expose the right port.
-- The Docker path hasn't been tested end-to-end against a real Postgres container by me
-  yet — I've only run the plain `npm run dev` setup locally. If `docker compose up`
-  misbehaves, the non-Docker steps above are the safe fallback.
 
 ## A few design decisions, in case anyone's wondering why
 
