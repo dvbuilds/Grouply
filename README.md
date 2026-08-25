@@ -1,43 +1,57 @@
 # Joineazy — Student, Group & Assignment Management System
 
-A role-based full-stack app for Joineazy: students form their own groups and confirm
-assignment submissions; professors post assignments and track group progress.
+A role-based app for managing student groups and assignment submissions. Students form
+their own groups and confirm when they've submitted; professors post assignments and
+keep an eye on which groups are behind.
 
-## 1. Overview of Implementation
+Built as a full-stack project: React on the frontend, Express/PostgreSQL on the backend,
+no ORM.
 
-- **Frontend:** React (Vite) + Tailwind CSS. Two role-based dashboards (Student / Admin)
-  behind a shared login, with a `ProtectedRoute` wrapper that checks the JWT-decoded role.
-- **Backend:** Node.js + Express, REST API, PostgreSQL via `pg` (raw parameterized SQL,
-  no ORM — chosen for transparency of the relational logic, which is the point being
-  evaluated here).
-- **Auth:** JWT, `bcryptjs` for password hashing. One `users` table with a `role` enum
-  (`student` / `admin`) rather than separate tables — both roles authenticate identically,
-  they just get different permissions and views.
-- **Two-step submission confirmation:** implemented as UI state (`pending → confirm`
-  dialog before the API call fires) rather than a separate backend endpoint, since the
-  "two-step" requirement is about preventing accidental clicks, not a two-phase server
-  transaction. The server call itself is a single atomic status flip.
-- **Containerization:** Docker Compose spins up Postgres, backend, and frontend together.
+## What it does
 
-## 2. Architecture
+- Students sign up, create a group (they become the leader automatically), and add
+  teammates by email or student ID.
+- Professors post assignments — either to every group at once, or to a specific list of
+  groups — with a due date and a link to the assignment resources.
+- Submitting isn't a file upload. A group member marks the assignment as submitted, then
+  confirms it in a second step. It's basically a two-click "yes, we're done" that's hard
+  to trigger by accident.
+- Professors get a tracking view per assignment (which groups/students have confirmed)
+  and an analytics page with completion stats and a couple of charts.
+
+## Stack
+
+- **Frontend** — React (Vite) + Tailwind. One shared login screen, two dashboards
+  (student / admin) behind a `ProtectedRoute` that reads the role out of the JWT.
+- **Backend** — Node + Express, REST API. PostgreSQL via `pg` directly — no Prisma/Sequelize.
+  I went with raw parameterized SQL on purpose here, mostly so the relational logic (joins,
+  transactions when creating a group/assignment) stays visible instead of hidden behind an
+  ORM layer.
+- **Auth** — JWT + bcrypt. One `users` table with a `role` enum (`student`/`admin`) rather
+  than two separate tables, since both roles log in the same way and only differ in what
+  they're allowed to do afterward.
+- **Docker** — `docker-compose.yml` spins up Postgres, backend, and frontend as three
+  services.
+
+## Architecture
 
 ```
 ┌─────────────┐      REST/JSON       ┌──────────────┐      SQL       ┌────────────┐
 │   React SPA │ ───────────────────▶ │ Express API  │ ──────────────▶│ PostgreSQL │
 │ (Vite+Tail) │ ◀─────────────────── │  (JWT auth)  │ ◀───────────── │            │
 └─────────────┘     JWT in header     └──────────────┘                └────────────┘
-     :5173                                  :5000                         :5432
+     :3000                                  :5000                         :5432
 ```
 
-- Frontend never talks to Postgres directly; everything goes through the Express API.
-- JWT is stored in `localStorage` and attached via an axios interceptor.
-- `requireAuth` middleware verifies the token; `requireRole('admin'|'student')` gates
-  role-specific endpoints (e.g. only admins can `POST /assignments`, only students can
-  `POST /groups`).
+The frontend never touches Postgres directly, everything goes through the API. The token
+lives in `localStorage` and gets attached to every request via an axios interceptor.
+`requireAuth` checks the token is valid; `requireRole('admin' | 'student')` gates the
+routes that are role-specific (only admins can post assignments, only students can create
+groups, etc).
 
-## 3. Database Schema & Relationships
+## Database
 
-See [`backend/src/db/schema.sql`](backend/src/db/schema.sql) for the full DDL.
+Full DDL is in [`backend/src/db/schema.sql`](backend/src/db/schema.sql). Roughly:
 
 ```mermaid
 erDiagram
@@ -93,15 +107,16 @@ erDiagram
   }
 ```
 
-*(GitHub renders this diagram automatically when viewing this file. If you're reading it elsewhere, paste the block into the [Mermaid Live Editor](https://mermaid.live).)*
+*(GitHub renders this automatically. If you're viewing it somewhere that doesn't, paste
+the block into [Mermaid Live](https://mermaid.live).)*
 
-**Key design decision:** a `submissions` row is pre-created (status `pending`) for every
-(assignment, group) pair the moment an assignment is posted, rather than only on
-confirmation. This means "not yet submitted" is a real row the admin dashboard can count,
-not an absence to infer — which is what makes the group-wise and assignment-wise progress
-queries a single `COUNT(...) FILTER (...)` instead of a subtraction against total groups.
+One decision worth calling out: a `submissions` row gets created for every
+(assignment, group) pair the moment the assignment is posted — status `pending` —
+instead of only creating a row once someone confirms. That way "hasn't submitted yet" is
+just a row sitting there, not something the admin dashboard has to infer by comparing
+against the group count. Makes the progress queries a single `COUNT(...) FILTER (...)`.
 
-## 4. API Endpoints
+## API
 
 | Method | Endpoint | Role | Description |
 |---|---|---|---|
@@ -124,101 +139,128 @@ queries a single `COUNT(...) FILTER (...)` instead of a subtraction against tota
 | POST | `/api/submissions/:assignmentId/groups/:groupId/confirm` | Student (member) | Final confirm (step 2) |
 | GET | `/api/submissions/groups/:groupId/progress` | Any | A group's submission progress + percent |
 | GET | `/api/submissions/:assignmentId` | Admin | Per-group status for one assignment |
-| GET | `/api/submissions/:assignmentId/students` | Admin | Student-wise status for one assignment (every student in a targeted group, with their group's confirmation status) |
+| GET | `/api/submissions/:assignmentId/students` | Admin | Student-wise status for one assignment |
 | GET | `/api/analytics/overview` | Admin | Totals + per-assignment + per-group completion |
 
-All protected routes expect `Authorization: Bearer <token>`. Request bodies are
-validated with `express-validator`; malformed input returns `400` with a
-`details` array (field + message) instead of reaching the database layer.
+All protected routes need `Authorization: Bearer <token>`. Bad input gets caught by
+`express-validator` before it reaches the database — you get a `400` with a `details`
+array (field + message) instead of a stack trace.
 
-## 5. Setup & Run Instructions
+## Running it
 
-### With Docker (recommended)
+### Env vars
+
+There's no `.env.example` checked in yet, so just create `backend/.env` yourself:
+
+```
+PORT=5000
+JWT_SECRET=replace-me-with-something-long
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_NAME=joineazy
+FRONTEND_URL=http://localhost:3000
+```
+
+`FRONTEND_URL` matters more than it looks — it's what the backend's CORS check allows.
+The frontend actually runs on **port 3000** (see `vite.config.js`), not 5173, so make sure
+this is set correctly or you'll get CORS errors instead of a login screen. This tripped
+me up once already — see Known Issues below.
+
+### With Docker
+
 ```bash
-cp backend/.env.example backend/.env
 docker compose up --build
 ```
-- Frontend: http://localhost:5173
+- Frontend: http://localhost:3000 (docker-compose currently maps `5173:5173`, which is
+  stale — see below)
 - Backend: http://localhost:5000/api
-- Postgres auto-runs `schema.sql` on first boot.
-- Optionally seed demo data: `docker compose exec backend npm run seed`
+- Postgres runs `schema.sql` automatically on first boot.
+- Seed some demo data: `docker compose exec backend npm run seed`
 
 ### Without Docker
+
 ```bash
-# Postgres: create a local db named "joineazy", then:
+# create a local Postgres db called "joineazy" first, then:
 cd backend
-cp .env.example .env   # point DB_HOST at localhost
 npm install
-npm run migrate        # applies schema.sql
-npm run seed            # optional: demo admin/students/groups/assignments
+npm run migrate     # applies schema.sql
+npm run seed         # optional — demo admin/students/groups/assignments
 npm run dev
 
-# in a second terminal
+# separate terminal
 cd frontend
 npm install
 npm run dev
 ```
 
-### Demo login (after `npm run seed`)
-All accounts use password `password123`.
+### Demo logins (after `npm run seed`)
+
+Everyone's password is `password123`.
+
 | Role | Email | Notes |
 |---|---|---|
-| Admin | `prof@joineazy.dev` | Posted both demo assignments |
+| Admin | `prof@joineazy.dev` | Posted most of the demo assignments |
+| Admin | `riyer@joineazy.dev` | Posted the rest |
 | Student | `divya@joineazy.dev` | Leader of Team Alpha |
 | Student | `aarav@joineazy.dev` | Member of Team Alpha |
 | Student | `riya@joineazy.dev` | Leader of Team Beta |
+| Student | `rohan@joineazy.dev` | Leader of Team Gamma |
+| Student | `neha@joineazy.dev` | Leader of Team Delta |
 
-### Running tests
+(there are a few more seeded students spread across the four groups if you want a
+fuller-looking demo)
+
+### Tests
+
 ```bash
 cd backend
-npm install
 npm test
 ```
-18 tests across auth, JWT/role middleware, and group/assignment validation —
-the database layer is mocked (`jest.mock('../src/db/pool')`), so no Postgres
-instance is required to run them.
 
-### Verification status
-This scaffold has been verified in the sandbox that generated it: `npm install`
-succeeds for both frontend and backend, every backend file passes `node --check`,
-`npm test` passes (18/18), the Express server boots and answers a real HTTP
-request to `/api/health`, and `npm run build` produces a clean Vite production
-bundle with no compile errors. **Not verified**: an actual `docker compose up`
-against a real Postgres instance — no Docker daemon was available in the
-sandbox this was built in, so treat the Docker path as untested (the plain
-Node.js path above has been exercised directly and is a safe fallback if
-`docker compose up` surfaces an issue).
+18 tests, covering auth, the JWT/role middleware, and group/assignment validation. The
+DB layer is mocked (`jest.mock('../src/db/pool')`), so you don't need a real Postgres
+instance running just to run the suite.
 
-## 6. Key Design & Deployment Decisions
+## Known issues
 
-- **Single `users` table with a role enum** instead of separate `students`/`admins`
-  tables — simpler auth, and a professor never needs student-only fields.
-- **Groups are reusable, not per-assignment** — students form a group once; admins later
-  target assignments at existing groups, matching how the problem statement describes it.
-- **Pre-created submission rows** (see §3) so "who hasn't submitted yet" is queryable
-  without a join against every group.
-- **Raw SQL over an ORM** — makes the relational logic (and the transactions used when
-  creating a group or an assignment) explicit and easy to explain in an interview.
-- **Docker Compose over a single Dockerfile** — mirrors how this would actually be
-  deployed (separate frontend/backend/DB services, e.g. on Render or Railway), and lets
-  the DB be swapped for a managed instance in production by just changing `DB_HOST`.
-- **Submission is a group action, tracked at the student level too** — confirming
-  submission updates one row per (assignment, group), but the admin's student-wise view
-  (`GET /submissions/:assignmentId/students`) joins through `group_members` so every
-  student's status is visible individually, not just their group's.
-- **Members can be added by email or student ID** — `addMember` accepts either, matching
-  the spec's "via student email or ID," and the group page exposes both as a toggle.
-- **Completion badges** (`Not Started` / `In Progress` / `Completed`) sit alongside every
-  progress bar, computed client-side from the percent the API already returns — no extra
-  backend state needed.
-- **Admin analytics uses real bar charts** (Recharts) for completion-by-assignment and
-  completion-by-group, in addition to the numeric summaries, satisfying the "basic charts
-  or summary counts" requirement with both.
-- **Group deletion is leader-only and cascades** — deleting a group removes its
-  memberships, assignment targets, and submission rows via `ON DELETE CASCADE` in the
-  schema, so there's no orphaned data to clean up manually. The leader can't remove
-  themselves or leave (`deleteGroup` is the only way to end a group they lead), keeping
-  "every group has exactly one leader" invariant simple to reason about.
-- **Validation lives in a middleware chain, not in controllers** — `validators.js` defines
-  `express-validator` rule chains per route, and `handleValidation` turns any failure into
-  a consistent `400` before the controller runs. Controllers stay focused on business logic.
+- **Port mismatch.** `docker-compose.yml` and `frontend/Dockerfile` both still reference
+  port 5173 for the frontend, but `vite.config.js` runs the dev server on 3000. Works fine
+  running frontend/backend separately outside Docker since you just hit whatever port Vite
+  actually printed, but the Docker port mapping needs fixing (`5173:5173` → `3000:3000`)
+  before `docker compose up` will expose the right port.
+- The Docker path hasn't been tested end-to-end against a real Postgres container by me
+  yet — I've only run the plain `npm run dev` setup locally. If `docker compose up`
+  misbehaves, the non-Docker steps above are the safe fallback.
+
+## A few design decisions, in case anyone's wondering why
+
+**Why one `users` table instead of separate `students`/`admins` tables?** Simpler auth,
+and honestly a professor account never needs student-only fields like `student_id`, so a
+single `role` column does the job without the extra join.
+
+**Why are groups reusable instead of created per-assignment?** Because that's how it
+actually works in a classroom — students pick teammates once at the start of a project,
+and every assignment after that just targets the groups that already exist.
+
+**Why no ORM?** Wanted the SQL — especially the transactions in `createGroup` and
+`createAssignment` — to be readable without having to know Prisma/Sequelize conventions.
+Also just prefer knowing exactly what query is hitting the database.
+
+**Submission tracking is per-group, but the admin view shows students too.** Confirming a
+submission updates one row per (assignment, group) — it's a group action. But
+`GET /submissions/:assignmentId/students` joins through `group_members` so a professor
+can still see every individual student's status, not just their group's, which matters
+if you're trying to figure out who in an unconfirmed group needs a nudge.
+
+**Group deletion cascades and is leader-only.** Deleting a group wipes its memberships,
+assignment targets, and submission rows via `ON DELETE CASCADE` — no orphaned rows to
+clean up by hand. The leader can't leave or remove themselves; deleting the group is the
+only way out, which keeps "every group has exactly one leader" simple to reason about
+everywhere else in the code.
+
+**Validation lives in middleware, not controllers.** `validators.js` has the
+`express-validator` rule chains per route, `handleValidation` turns any failure into a
+consistent `400` before the controller even runs. Keeps controllers focused on what
+they're actually supposed to do.
