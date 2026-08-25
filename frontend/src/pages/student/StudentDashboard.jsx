@@ -3,21 +3,19 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
 import DashboardLayout from '../../components/layout/DashboardLayout.jsx';
 import Button from '../../components/ui/Button.jsx';
+import Badge from '../../components/ui/Badge.jsx';
 import ProgressBar from '../../components/ui/ProgressBar.jsx';
 import { getMyAssignmentsApi } from '../../api/assignments.js';
 import { getMyGroupsApi } from '../../api/groups.js';
+import { attachSubmissionStatus } from '../../utils/assignmentStatus.js';
 import {
   BookOpen,
   GraduationCap,
   FileText,
-  TrendingUp,
   ArrowUpRight,
   ChevronRight,
-  Calendar as CalendarIcon,
   Clock,
   ExternalLink,
-  Plus,
-  CheckCircle2,
   Sparkles,
 } from 'lucide-react';
 import { formatDate } from '../../utils/formatters.js';
@@ -28,8 +26,6 @@ export default function StudentDashboard() {
 
   const [assignments, setAssignments] = useState([]);
   const [groups, setGroups] = useState([]);
-  const [calendarView, setCalendarView] = useState('weekly');
-  const [selectedDay, setSelectedDay] = useState(4);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -39,7 +35,8 @@ export default function StudentDashboard() {
           getMyAssignmentsApi(),
           getMyGroupsApi(),
         ]);
-        setAssignments(assignData || []);
+        const withStatus = await attachSubmissionStatus(assignData || []);
+        setAssignments(withStatus);
         setGroups(groupData || []);
       } catch (err) {
         console.error('Error loading dashboard data', err);
@@ -50,15 +47,19 @@ export default function StudentDashboard() {
     fetchData();
   }, []);
 
-  const weekDays = [
-    { label: 'Mon', day: 1 },
-    { label: 'Tue', day: 2 },
-    { label: 'Wed', day: 3 },
-    { label: 'Thu', day: 4 },
-    { label: 'Fri', day: 5 },
-    { label: 'Sat', day: 6 },
-    { label: 'Sun', day: 7 },
-  ];
+  const now = new Date();
+  const upcomingCount = assignments.filter((a) => {
+    const due = new Date(a.due_date);
+    return due >= now && !a.is_submitted;
+  }).length;
+  const submittedCount = assignments.filter((a) => a.is_submitted).length;
+  const completionRate = assignments.length
+    ? Math.round((submittedCount / assignments.length) * 100)
+    : 0;
+
+  const upcomingAssignments = [...assignments]
+    .sort((a, b) => new Date(a.due_date) - new Date(b.due_date))
+    .slice(0, 3);
 
   return (
     <DashboardLayout
@@ -66,9 +67,9 @@ export default function StudentDashboard() {
       subtitle="Student Dashboard"
     >
       <div className="flex flex-col lg:flex-row gap-6 pb-12">
-        {/* Left Column (Main Feed & Courses) */}
+        {/* Left Column (Main Feed) */}
         <div className="flex-1 flex flex-col gap-6">
-          {/* Hero Banner (Academic Clarity Primary Forest Green) */}
+          {/* Hero Banner */}
           <div className="bg-[#012d1d] text-white rounded-3xl p-6 md:p-8 relative overflow-hidden soft-shadow">
             <div className="absolute -right-16 -bottom-16 w-80 h-80 bg-[#1b4332] rounded-full blur-3xl opacity-60 pointer-events-none" />
             <div className="relative z-10 max-w-md">
@@ -78,7 +79,8 @@ export default function StudentDashboard() {
                 succeed tomorrow!
               </h3>
               <p className="text-xs md:text-sm text-[#a5d0b9] leading-relaxed mb-6">
-                Discover new features for smart learning platform designed to help you collaborate with your group and achieve your academic goals.
+                Track your assignments, collaborate with your group, and confirm submissions
+                before their deadlines.
               </p>
               <div className="flex items-center gap-3">
                 <Button
@@ -100,7 +102,6 @@ export default function StudentDashboard() {
               </div>
             </div>
 
-            {/* 3D Geometric Aesthetic Representation */}
             <div className="absolute right-4 top-1/2 -translate-y-1/2 hidden md:flex items-center justify-center pointer-events-none opacity-90">
               <div className="relative w-44 h-44 flex items-center justify-center">
                 <div className="w-32 h-32 rounded-full border-8 border-[#ffb702]/80 animate-pulse" />
@@ -110,70 +111,53 @@ export default function StudentDashboard() {
             </div>
           </div>
 
-          {/* Bento Grid Stats */}
+          {/* Bento Grid Stats — real numbers from the student's own data */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {/* New Courses */}
             <div className="bg-[#ffb702] rounded-2xl p-5 soft-shadow hover-lift flex flex-col justify-between h-36 text-[#6b4b00]">
               <div className="flex items-center gap-2 font-semibold text-xs uppercase tracking-wide text-[#6b4b00]">
                 <BookOpen className="w-4 h-4" />
-                <span>New courses</span>
+                <span>My Groups</span>
               </div>
               <div>
-                <div className="flex items-end gap-2 mb-1">
-                  <span className="text-3xl font-bold text-[#271900]">+2</span>
-                  <span className="bg-white/50 text-[#271900] text-[11px] font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5 mb-1">
-                    <ArrowUpRight className="w-3 h-3" />
-                    40%
-                  </span>
-                </div>
-                <p className="text-xs text-[#6b4b00]/90">3 new courses started</p>
+                <span className="text-3xl font-bold text-[#271900]">{groups.length}</span>
+                <p className="text-xs text-[#6b4b00]/90 mt-1">
+                  {groups.length === 1 ? 'group you belong to' : 'groups you belong to'}
+                </p>
               </div>
             </div>
 
-            {/* Course Progress */}
             <div className="bg-[#4361EE] rounded-2xl p-5 soft-shadow hover-lift flex flex-col justify-between h-36 text-white">
               <div className="flex items-center gap-2 font-semibold text-xs uppercase tracking-wide text-white/90">
                 <GraduationCap className="w-4 h-4" />
-                <span>Course progress</span>
+                <span>Submission rate</span>
               </div>
               <div>
-                <div className="flex items-end gap-2 mb-1">
-                  <span className="text-3xl font-bold">50%</span>
-                  <span className="bg-white/20 text-white text-[11px] font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5 mb-1">
-                    <ArrowUpRight className="w-3 h-3" />
-                    18%
-                  </span>
-                </div>
-                <p className="text-xs text-white/80">of your courses are done</p>
+                <span className="text-3xl font-bold">{completionRate}%</span>
+                <p className="text-xs text-white/80 mt-1">
+                  {submittedCount} of {assignments.length} confirmed
+                </p>
               </div>
             </div>
 
-            {/* Assignments Progress */}
             <div className="bg-[#453268] rounded-2xl p-5 soft-shadow hover-lift flex flex-col justify-between h-36 text-white">
               <div className="flex items-center gap-2 font-semibold text-xs uppercase tracking-wide text-white/90">
                 <FileText className="w-4 h-4" />
-                <span>Assignments</span>
+                <span>Pending</span>
               </div>
               <div>
-                <div className="flex items-end gap-2 mb-1">
-                  <span className="text-3xl font-bold">89%</span>
-                  <span className="bg-white/20 text-white text-[11px] font-bold px-2 py-0.5 rounded-full flex items-center gap-0.5 mb-1">
-                    <ArrowUpRight className="w-3 h-3" />
-                    10%
-                  </span>
-                </div>
-                <p className="text-xs text-white/80">Based on recent tasks</p>
+                <span className="text-3xl font-bold">{upcomingCount}</span>
+                <p className="text-xs text-white/80 mt-1">assignments awaiting submission</p>
               </div>
             </div>
           </div>
 
-          {/* Active Courses Section */}
+          {/* Upcoming Assignments */}
           <div className="mt-2 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <h3 className="font-bold text-lg text-[#191c1d]">Active Courses</h3>
+                <h3 className="font-bold text-lg text-[#191c1d]">Upcoming Assignments</h3>
                 <span className="text-xs bg-[#e1e3e4] text-[#414844] font-semibold px-2.5 py-0.5 rounded-full">
-                  5 courses
+                  {assignments.length} total
                 </span>
               </div>
               <button
@@ -185,153 +169,53 @@ export default function StudentDashboard() {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Course Card 1: JS Basics */}
-              <div
-                onClick={() => navigate('/student/assignments/1')}
-                className="bg-white rounded-2xl p-5 soft-shadow hover-lift border border-[#e1e3e4] flex flex-col cursor-pointer group"
-              >
-                <h4 className="font-bold text-sm text-[#191c1d] group-hover:text-[#012d1d] transition-colors">
-                  JavaScript Basics
-                </h4>
-                <p className="text-xs text-[#717973] mb-4">13/35 lessons</p>
-                <div className="h-28 flex items-center justify-center my-2 relative">
-                  <div className="w-20 h-20 rounded-full border-8 border-[#ffb702] border-t-[#D90429] flex items-center justify-center shadow-inner group-hover:rotate-45 transition-transform duration-500">
-                    <span className="text-xs font-bold text-[#191c1d]">JS</span>
-                  </div>
-                </div>
-                <div className="mt-auto pt-3 border-t border-[#f3f4f5]">
-                  <div className="flex justify-between items-center text-xs mb-1.5">
-                    <span className="text-[#717973]">37% complete</span>
-                  </div>
-                  <ProgressBar value={37} color="accent" size="sm" />
-                </div>
+            {upcomingAssignments.length === 0 ? (
+              <div className="bg-white rounded-2xl p-8 text-center border border-[#e1e3e4] text-sm text-[#717973]">
+                No assignments yet.
               </div>
-
-              {/* Course Card 2: HTML Basics */}
-              <div
-                onClick={() => navigate('/student/assignments/2')}
-                className="bg-white rounded-2xl p-5 soft-shadow hover-lift border border-[#e1e3e4] flex flex-col cursor-pointer group"
-              >
-                <h4 className="font-bold text-sm text-[#191c1d] group-hover:text-[#012d1d] transition-colors">
-                  HTML & CSS Basics
-                </h4>
-                <p className="text-xs text-[#717973] mb-4">13/25 lessons</p>
-                <div className="h-28 flex items-center justify-center my-2 relative">
-                  <div className="flex gap-2 items-end">
-                    <div className="w-6 h-16 bg-[#2D6A4F] rounded-t-lg" />
-                    <div className="w-6 h-22 bg-[#a5d0b9] rounded-t-lg" />
-                    <div className="w-6 h-12 bg-[#012d1d] rounded-t-lg" />
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {upcomingAssignments.map((item) => (
+                  <div
+                    key={item.id}
+                    onClick={() => navigate(`/student/assignments/${item.id}`)}
+                    className="bg-white rounded-2xl p-5 soft-shadow hover-lift border border-[#e1e3e4] flex flex-col cursor-pointer group"
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <h4 className="font-bold text-sm text-[#191c1d] group-hover:text-[#012d1d] transition-colors line-clamp-2">
+                        {item.title}
+                      </h4>
+                      {item.is_submitted ? (
+                        <Badge variant="success" dot>Done</Badge>
+                      ) : (
+                        <Badge variant="warning" dot>Pending</Badge>
+                      )}
+                    </div>
+                    <p className="text-xs text-[#717973] mb-4 flex items-center gap-1">
+                      <Clock className="w-3.5 h-3.5" />
+                      Due {formatDate(item.due_date)}
+                    </p>
+                    {item.onedrive_link && (
+                      <a
+                        href={item.onedrive_link}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="mt-auto text-xs text-[#4361EE] hover:underline font-semibold flex items-center gap-1"
+                      >
+                        <span>Starter files</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    )}
                   </div>
-                </div>
-                <div className="mt-auto pt-3 border-t border-[#f3f4f5]">
-                  <div className="flex justify-between items-center text-xs mb-1.5">
-                    <span className="text-[#717973]">55% complete</span>
-                  </div>
-                  <ProgressBar value={55} color="success" size="sm" />
-                </div>
+                ))}
               </div>
-
-              {/* Course Card 3: UI/UX Design */}
-              <div
-                onClick={() => navigate('/student/assignments/3')}
-                className="bg-white rounded-2xl p-5 soft-shadow hover-lift border border-[#e1e3e4] flex flex-col cursor-pointer group"
-              >
-                <h4 className="font-bold text-sm text-[#191c1d] group-hover:text-[#012d1d] transition-colors">
-                  UI/UX Design
-                </h4>
-                <p className="text-xs text-[#717973] mb-4">10/25 lessons</p>
-                <div className="h-28 flex items-center justify-center my-2 relative">
-                  <div className="w-16 h-16 rounded-2xl bg-[#ebdcff] border-2 border-[#d3bcfc] flex items-center justify-center text-[#2e1b50] font-bold shadow-xs">
-                    🎨
-                  </div>
-                </div>
-                <div className="mt-auto pt-3 border-t border-[#f3f4f5]">
-                  <div className="flex justify-between items-center text-xs mb-1.5">
-                    <span className="text-[#717973]">40% complete</span>
-                  </div>
-                  <ProgressBar value={40} color="warning" size="sm" />
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         </div>
 
-        {/* Right Column: Calendar & Homework Widget */}
+        {/* Right Column: Homework Progress Widget */}
         <div className="w-full lg:w-80 shrink-0 flex flex-col gap-6">
-          {/* Mini Calendar Widget */}
-          <div className="bg-white/90 backdrop-blur-md rounded-3xl p-6 soft-shadow border border-[#e1e3e4]">
-            {/* View toggle */}
-            <div className="bg-[#f3f4f5] rounded-xl p-1 flex mb-5 text-xs font-semibold">
-              <button
-                onClick={() => setCalendarView('weekly')}
-                className={`flex-1 py-1.5 rounded-lg transition-all ${
-                  calendarView === 'weekly'
-                    ? 'bg-[#012d1d] text-white shadow-xs'
-                    : 'text-[#717973] hover:text-[#191c1d]'
-                }`}
-              >
-                Weekly
-              </button>
-              <button
-                onClick={() => setCalendarView('monthly')}
-                className={`flex-1 py-1.5 rounded-lg transition-all ${
-                  calendarView === 'monthly'
-                    ? 'bg-[#012d1d] text-white shadow-xs'
-                    : 'text-[#717973] hover:text-[#191c1d]'
-                }`}
-              >
-                Monthly
-              </button>
-            </div>
-
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold text-[#191c1d]">September 2026</h3>
-              <span className="text-xs font-bold text-[#2D6A4F] bg-[#2D6A4F]/10 px-2 py-0.5 rounded-full">
-                Active
-              </span>
-            </div>
-
-            {/* Days strip */}
-            <div className="grid grid-cols-7 gap-1 text-center mb-6">
-              {weekDays.map((item) => {
-                const isSelected = selectedDay === item.day;
-                return (
-                  <button
-                    key={item.day}
-                    onClick={() => setSelectedDay(item.day)}
-                    className={`flex flex-col items-center py-2 rounded-xl transition-all ${
-                      isSelected
-                        ? 'bg-[#012d1d] text-white shadow-sm font-bold'
-                        : 'hover:bg-[#f3f4f5] text-[#414844]'
-                    }`}
-                  >
-                    <span className="text-[10px] text-current opacity-80">{item.label}</span>
-                    <span className="text-sm mt-0.5">{item.day}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="flex items-center justify-between pt-4 border-t border-[#f3f4f5]">
-              <button
-                onClick={() => alert('Add note dialog')}
-                className="text-xs font-semibold text-[#414844] hover:text-[#012d1d] flex items-center gap-1.5"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                Add note
-              </button>
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={() => navigate('/student/assignments')}
-              >
-                New event
-              </Button>
-            </div>
-          </div>
-
-          {/* Homework Progress Widget */}
           <div className="bg-white/90 backdrop-blur-md rounded-3xl p-6 soft-shadow border border-[#e1e3e4] flex-1">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-base text-[#191c1d]">Homework Progress</h3>
@@ -344,7 +228,7 @@ export default function StudentDashboard() {
             </div>
 
             <div className="space-y-3">
-              {assignments.slice(0, 3).map((item) => (
+              {assignments.slice(0, 5).map((item) => (
                 <div
                   key={item.id}
                   onClick={() => navigate(`/student/assignments/${item.id}`)}
@@ -366,17 +250,20 @@ export default function StudentDashboard() {
                   <div className="mt-3 flex items-center gap-3">
                     <div className="flex-1">
                       <ProgressBar
-                        value={item.is_submitted ? 100 : 35}
+                        value={item.is_submitted ? 100 : 0}
                         color={item.is_submitted ? 'success' : 'accent'}
                         size="sm"
                       />
                     </div>
                     <span className="text-xs font-bold text-[#191c1d]">
-                      {item.is_submitted ? '100%' : '35%'}
+                      {item.is_submitted ? 'Confirmed' : 'Pending'}
                     </span>
                   </div>
                 </div>
               ))}
+              {assignments.length === 0 && (
+                <p className="text-xs text-[#717973] text-center py-4">No assignments yet.</p>
+              )}
             </div>
           </div>
         </div>

@@ -9,21 +9,12 @@ import {
   getAssignmentSubmissionsApi,
   getAssignmentStudentSubmissionsApi,
 } from '../../api/submissions.js';
-import {
-  CheckSquare,
-  Users,
-  User,
-  CheckCircle2,
-  Clock,
-  Filter,
-  FileSpreadsheet,
-  Calendar,
-} from 'lucide-react';
+import { Users, User, FileSpreadsheet } from 'lucide-react';
 import { getInitials, formatDate } from '../../utils/formatters.js';
 
 export default function AdminSubmissionTracking() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const initialAssignmentId = searchParams.get('assignmentId') || '1';
+  const initialAssignmentId = searchParams.get('assignmentId') || '';
 
   const [assignments, setAssignments] = useState([]);
   const [selectedAssignmentId, setSelectedAssignmentId] = useState(initialAssignmentId);
@@ -166,8 +157,7 @@ export default function AdminSubmissionTracking() {
                 <thead>
                   <tr className="bg-[#f8f9fa] border-b border-[#e1e3e4] text-[11px] font-semibold text-[#717973] uppercase tracking-wider">
                     <th className="py-4 px-6">Group Name</th>
-                    <th className="py-4 px-6">Leader</th>
-                    <th className="py-4 px-6">Members</th>
+                    <th className="py-4 px-6">Confirmed By</th>
                     <th className="py-4 px-6">Status</th>
                     <th className="py-4 px-6 text-right">Confirmed At</th>
                   </tr>
@@ -177,22 +167,17 @@ export default function AdminSubmissionTracking() {
                     const isConfirmed = group.status === 'confirmed';
 
                     return (
-                      <tr key={group.id || group.group_id} className="hover:bg-[#f8f9fa]">
+                      <tr key={group.group_id} className="hover:bg-[#f8f9fa]">
                         <td className="py-4 px-6">
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-xl bg-[#012d1d]/10 text-[#012d1d] font-bold flex items-center justify-center text-xs">
-                              {group.name?.charAt(0) || 'G'}
+                              {group.group_name?.charAt(0) || 'G'}
                             </div>
-                            <span className="font-bold text-sm text-[#191c1d]">{group.name}</span>
+                            <span className="font-bold text-sm text-[#191c1d]">{group.group_name}</span>
                           </div>
                         </td>
                         <td className="py-4 px-6 text-[#414844]">
-                          {group.leader_name || 'Group Leader'}
-                        </td>
-                        <td className="py-4 px-6">
-                          <span className="text-[#717973] font-medium">
-                            {group.member_count || group.members?.length || 1} students
-                          </span>
+                          {group.confirmed_by_name || '—'}
                         </td>
                         <td className="py-4 px-6">
                           {isConfirmed ? (
@@ -206,8 +191,8 @@ export default function AdminSubmissionTracking() {
                           )}
                         </td>
                         <td className="py-4 px-6 text-right font-mono text-[#717973]">
-                          {isConfirmed && group.submitted_at
-                            ? new Date(group.submitted_at).toLocaleTimeString([], {
+                          {isConfirmed && group.confirmed_at
+                            ? new Date(group.confirmed_at).toLocaleTimeString([], {
                                 hour: '2-digit',
                                 minute: '2-digit',
                                 month: 'short',
@@ -239,20 +224,20 @@ export default function AdminSubmissionTracking() {
                     const isConfirmed = student.status === 'confirmed';
 
                     return (
-                      <tr key={student.id || student.email} className="hover:bg-[#f8f9fa]">
+                      <tr key={student.student_id} className="hover:bg-[#f8f9fa]">
                         <td className="py-4 px-6">
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full bg-[#012d1d]/10 text-[#012d1d] font-bold text-xs flex items-center justify-center">
-                              {getInitials(student.name)}
+                              {getInitials(student.student_name)}
                             </div>
                             <div>
-                              <p className="font-bold text-[#191c1d]">{student.name}</p>
+                              <p className="font-bold text-[#191c1d]">{student.student_name}</p>
                               <p className="text-[11px] text-[#717973]">{student.email}</p>
                             </div>
                           </div>
                         </td>
                         <td className="py-4 px-6 font-mono text-[#414844]">
-                          {student.student_id || '—'}
+                          {student.roll_no || '—'}
                         </td>
                         <td className="py-4 px-6">
                           <Badge variant="neutral">{student.group_name || 'Group'}</Badge>
@@ -269,8 +254,8 @@ export default function AdminSubmissionTracking() {
                           )}
                         </td>
                         <td className="py-4 px-6 text-right text-[#717973] font-mono">
-                          {isConfirmed && student.submitted_at
-                            ? new Date(student.submitted_at).toLocaleDateString()
+                          {isConfirmed && student.confirmed_at
+                            ? new Date(student.confirmed_at).toLocaleDateString()
                             : '—'}
                         </td>
                       </tr>

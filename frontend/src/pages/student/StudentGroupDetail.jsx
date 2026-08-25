@@ -70,10 +70,7 @@ export default function StudentGroupDetail() {
     fetchGroupDetails();
   }, [groupId]);
 
-  const isLeader =
-    group?.is_leader ||
-    group?.leader_id === user?.id ||
-    members.find((m) => m.id === user?.id)?.is_leader;
+  const isLeader = group?.leader_id === user?.id;
 
   const handleRemoveMember = async (memberId) => {
     await removeGroupMemberApi(groupId, memberId);
@@ -192,14 +189,14 @@ export default function StudentGroupDetail() {
                   Group Assignment Progress
                 </h3>
                 <p className="text-xs text-[#717973]">
-                  {progress.completed_assignments || 0} of {progress.total_assignments || 0} completed
+                  {progress.confirmed || 0} of {progress.total || 0} completed
                 </p>
               </div>
               <span className="text-lg font-bold text-[#012d1d]">
-                {progress.percentage || 0}%
+                {progress.percent || 0}%
               </span>
             </div>
-            <ProgressBar value={progress.percentage || 0} color="auto" size="md" />
+            <ProgressBar value={progress.percent || 0} color="auto" size="md" />
           </div>
         )}
 
@@ -226,6 +223,7 @@ export default function StudentGroupDetail() {
             members={members}
             isLeader={isLeader}
             currentUserId={user?.id}
+            leaderId={group?.leader_id}
             onRemoveMember={handleRemoveMember}
           />
         </div>

@@ -22,12 +22,11 @@ export default function AddMemberModal({ isOpen, onClose, groupId, groupName, on
 
     try {
       const payload = inputType === 'email' ? { email: identifier.trim() } : { student_id: identifier.trim() };
-      const response = await addGroupMemberApi(groupId, payload);
+      await addGroupMemberApi(groupId, payload);
       setIdentifier('');
       onClose();
-      if (onMemberAdded) onMemberAdded(response.member || response);
+      if (onMemberAdded) onMemberAdded();
     } catch (err) {
-      console.error(err);
       setError(
         err.response?.data?.details?.[0]?.message ||
           err.response?.data?.message ||

@@ -7,7 +7,6 @@ import {
   setStoredUser,
   clearStoredAuth,
 } from '../utils/storage.js';
-import { INITIAL_USERS } from '../api/seedData.js';
 
 const AuthContext = createContext(null);
 
@@ -16,32 +15,26 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(getStoredToken());
   const [isLoading, setIsLoading] = useState(true);
 
-  // Initialize session
+  // On mount, verify any stored token against the backend so a stale or
+  // revoked token doesn't leave the app in a falsely-authenticated state.
   useEffect(() => {
     const initAuth = async () => {
       const savedToken = getStoredToken();
       if (!savedToken) {
-        // Provide default demo student session on first load so user immediately sees the rich dashboard
-        const defaultUser = INITIAL_USERS[1]; // Divya Sharma (Student Leader)
-        const defaultToken = btoa(JSON.stringify({ id: defaultUser.id, email: defaultUser.email, role: defaultUser.role }));
-        setUser(defaultUser);
-        setToken(defaultToken);
-        setStoredToken(defaultToken);
-        setStoredUser(defaultUser);
         setIsLoading(false);
         return;
       }
 
       try {
         const data = await getMeApi();
-        if (data?.user) {
-          setUser(data.user);
-          setStoredUser(data.user);
+        if (data) {
+          setUser(data);
+          setStoredUser(data);
         }
       } catch (err) {
-        console.warn('Could not verify token with backend, keeping cached user session', err);
-        const cached = getStoredUser();
-        if (cached) setUser(cached);
+        clearStoredAuth();
+        setUser(null);
+        setToken(null);
       } finally {
         setIsLoading(false);
       }
@@ -84,15 +77,6 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
   };
 
-  const switchDemoUser = (userEmail) => {
-    const target = INITIAL_USERS.find((u) => u.email.toLowerCase() === userEmail.toLowerCase()) || INITIAL_USERS[1];
-    const dummyToken = btoa(JSON.stringify({ id: target.id, email: target.email, role: target.role }));
-    setToken(dummyToken);
-    setUser(target);
-    setStoredToken(dummyToken);
-    setStoredUser(target);
-  };
-
   const value = {
     user,
     token,
@@ -101,7 +85,6 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
-    switchDemoUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

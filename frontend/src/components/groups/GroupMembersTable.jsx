@@ -9,6 +9,7 @@ export default function GroupMembersTable({
   members = [],
   isLeader = false,
   currentUserId,
+  leaderId,
   onRemoveMember,
 }) {
   const [memberToRemove, setMemberToRemove] = useState(null);
@@ -52,7 +53,7 @@ export default function GroupMembersTable({
             </thead>
             <tbody className="divide-y divide-[#f3f4f5] text-sm">
               {members.map((member) => {
-                const isThisMemberLeader = member.is_leader;
+                const isThisMemberLeader = member.id === leaderId;
                 const isCurrentUser = member.id === currentUserId;
 
                 return (

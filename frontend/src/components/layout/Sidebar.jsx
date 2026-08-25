@@ -149,17 +149,9 @@ export default function Sidebar({ className = '' }) {
         {/* User Card */}
         {user && (
           <div className="flex items-center gap-3 px-2 py-2 rounded-xl bg-[#f3f4f5]/60 border border-[#e1e3e4]/60">
-            {user.avatar ? (
-              <img
-                src={user.avatar}
-                alt={user.name}
-                className="w-9 h-9 rounded-full object-cover border border-white shadow-xs"
-              />
-            ) : (
-              <div className="w-9 h-9 rounded-full bg-[#012d1d] text-white flex items-center justify-center text-xs font-bold shadow-xs">
-                {getInitials(user.name)}
-              </div>
-            )}
+            <div className="w-9 h-9 rounded-full bg-[#012d1d] text-white flex items-center justify-center text-xs font-bold shadow-xs">
+              {getInitials(user.name)}
+            </div>
             <div className="flex flex-col min-w-0 flex-1">
               <span className="text-xs font-bold text-[#191c1d] truncate">
                 {user.name}

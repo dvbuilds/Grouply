@@ -13,12 +13,9 @@ import {
   Users,
   GraduationCap,
   FilePlus,
-  BarChart3,
   TrendingUp,
-  Clock,
   Plus,
   ArrowRight,
-  ShieldCheck,
   CheckCircle2,
 } from 'lucide-react';
 
@@ -52,6 +49,32 @@ export default function AdminDashboard() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const totals = analytics?.totals || {};
+  const overallCompletion = totals.total_submissions
+    ? Math.round((totals.confirmed_submissions / totals.total_submissions) * 100)
+    : 0;
+
+  // Build a lookup of assignment id -> completion % from the per-assignment
+  // analytics, so the "Active Coursework" table and the bar chart share the
+  // same real numbers.
+  const completionByAssignmentId = {};
+  (analytics?.perAssignment || []).forEach((a) => {
+    completionByAssignmentId[a.id] = a.target_groups
+      ? Math.round((a.confirmed_groups / a.target_groups) * 100)
+      : 0;
+  });
+
+  const completionChartData = (analytics?.perAssignment || []).map((a) => ({
+    shortTitle: a.title.length > 12 ? `${a.title.slice(0, 12)}…` : a.title,
+    title: a.title,
+    completion: a.target_groups ? Math.round((a.confirmed_groups / a.target_groups) * 100) : 0,
+  }));
+
+  const groupPerformanceData = (analytics?.perGroup || []).map((g) => ({
+    name: g.name,
+    completion: g.total ? Math.round((g.confirmed / g.total) * 100) : 0,
+  }));
 
   return (
     <DashboardLayout
@@ -89,36 +112,28 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard
             title="Total Students"
-            value={analytics?.total_students || 128}
-            subtitle="Enrolled in active cohorts"
-            trend="+12% this month"
-            trendPositive={true}
+            value={totals.total_students ?? 0}
+            subtitle="Enrolled across all groups"
             icon={GraduationCap}
           />
           <StatCard
             title="Active Groups"
-            value={analytics?.total_groups || groups.length || 12}
+            value={totals.total_groups ?? groups.length}
             subtitle="Study teams & project pods"
-            trend="+3 new teams"
-            trendPositive={true}
             icon={Users}
             variant="gold"
           />
           <StatCard
             title="Assignments"
-            value={analytics?.total_assignments || assignments.length || 8}
+            value={totals.total_assignments ?? assignments.length}
             subtitle="Coursework items deployed"
-            trend="4 due this week"
-            trendPositive={true}
             icon={FilePlus}
             variant="accent"
           />
           <StatCard
             title="Class Completion"
-            value={`${analytics?.overall_completion_rate || 76}%`}
-            subtitle="Average group submission rate"
-            trend="+8% from last week"
-            trendPositive={true}
+            value={`${overallCompletion}%`}
+            subtitle={`${totals.confirmed_submissions ?? 0} of ${totals.total_submissions ?? 0} submissions confirmed`}
             icon={TrendingUp}
             variant="primary"
           />
@@ -146,16 +161,7 @@ export default function AdminDashboard() {
               </Button>
             </div>
 
-            <CompletionBarChart
-              data={
-                analytics?.completion_by_assignment || [
-                  { shortTitle: 'JS Basics', title: 'JavaScript Basics', completion: 92 },
-                  { shortTitle: 'HTML/CSS', title: 'HTML & CSS Layouts', completion: 78 },
-                  { shortTitle: 'UI/UX', title: 'UI/UX Design Systems', completion: 64 },
-                  { shortTitle: 'Data Struct', title: 'Data Structures', completion: 41 },
-                ]
-              }
-            />
+            <CompletionBarChart data={completionChartData} />
           </div>
 
           {/* Group Performance (1 col) */}
@@ -170,16 +176,7 @@ export default function AdminDashboard() {
                 </span>
               </div>
 
-              <GroupPerformanceBars
-                groups={
-                  analytics?.group_performance || [
-                    { name: 'Alpha Cohort', completion: 92 },
-                    { name: 'Beta Squad', completion: 78 },
-                    { name: 'Gamma Team', completion: 64 },
-                    { name: 'Delta Force', completion: 41 },
-                  ]
-                }
-              />
+              <GroupPerformanceBars groups={groupPerformanceData} />
             </div>
 
             <div className="pt-4 mt-6 border-t border-[#f3f4f5]">
@@ -238,7 +235,7 @@ export default function AdminDashboard() {
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-2">
                         <span className="font-bold text-[#191c1d]">
-                          {item.completion_rate || 75}%
+                          {completionByAssignmentId[item.id] ?? 0}%
                         </span>
                       </div>
                     </td>

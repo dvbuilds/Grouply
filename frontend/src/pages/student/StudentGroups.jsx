@@ -77,7 +77,7 @@ export default function StudentGroups() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {groups.map((group) => {
-              const isLeader = group.is_leader || group.leader_id === user?.id;
+              const isLeader = group.leader_id === user?.id;
 
               return (
                 <div
@@ -103,14 +103,14 @@ export default function StudentGroups() {
                       {group.name}
                     </h4>
                     <p className="text-xs text-[#717973] mb-4">
-                      Leader: {group.leader_name || 'Leader'}
+                      {isLeader ? 'You are the leader' : 'You are a member of this group'}
                     </p>
 
                     <div className="bg-[#f8f9fa] rounded-2xl p-3.5 border border-[#e1e3e4]/60 space-y-2 mb-4">
                       <div className="flex justify-between text-xs">
                         <span className="text-[#717973]">Members</span>
                         <span className="font-bold text-[#191c1d]">
-                          {group.member_count || group.members?.length || 1} Students
+                          {group.member_count || 1} Students
                         </span>
                       </div>
                       <div className="flex justify-between text-xs">

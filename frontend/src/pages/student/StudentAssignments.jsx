@@ -5,14 +5,12 @@ import Button from '../../components/ui/Button.jsx';
 import Badge from '../../components/ui/Badge.jsx';
 import ProgressBar from '../../components/ui/ProgressBar.jsx';
 import { getMyAssignmentsApi } from '../../api/assignments.js';
+import { attachSubmissionStatus } from '../../utils/assignmentStatus.js';
 import {
   FileText,
   Clock,
   ExternalLink,
-  CheckCircle2,
-  AlertCircle,
   Search,
-  Filter,
   ArrowRight,
 } from 'lucide-react';
 import { formatDate } from '../../utils/formatters.js';
@@ -29,7 +27,8 @@ export default function StudentAssignments() {
     try {
       setIsLoading(true);
       const data = await getMyAssignmentsApi();
-      setAssignments(data || []);
+      const withStatus = await attachSubmissionStatus(data || []);
+      setAssignments(withStatus);
     } catch (err) {
       console.error(err);
     } finally {
